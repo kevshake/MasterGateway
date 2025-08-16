@@ -1,0 +1,9 @@
+
+iso8583:
+  packager: org.jpos.iso.packager.GenericPackager
+  fields:
+    0: LLVAR
+    1: LLVAR
+    2: N
+    3: ANS
+    4: BINARY
