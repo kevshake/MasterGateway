@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- POS Channel Adapter Configuration -->
+<channel-adaptor name='pos-channel' logger="Q2">
+    <channel class="org.jpos.iso.channel.NACChannel" 
+             packager="com.kevshake.gateway.packagers.POSPackager" 
+             header="">
+        <property name="host" value="0.0.0.0" />
+        <property name="port" value="8000" />
+        <property name="timeout" value="300000" />
+        <property name="keep-alive" value="true" />
+    </channel>
+
+    <in>pos-send</in>
+    <out>pos-receive</out>
+    <reconnect-delay>10000</reconnect-delay>
+</channel-adaptor>

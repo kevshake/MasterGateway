@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Bank Channel Multiplexer Configuration -->
+<mux class="org.jpos.q2.iso.QMUX" logger="BANK" name="bank-mux">
+    <in>bank-receive</in>
+    <out>bank-send</out>
+    <unhandled>bank-unhandled</unhandled>
+    <key>11,37,41,42</key>
+    <ready>bank-channel.ready</ready>
+</mux>

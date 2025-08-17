@@ -77,7 +77,7 @@ The server will start on:
 
 ### 2. Run Test Client
 ```bash
-java -cp target/classes com.kevshake.gateway.cmponents.Iso8583TestClient
+java -cp target/classes com.kevshake.gateway.components.Iso8583TestClient
 ```
 
 ### 3. Send Custom Messages

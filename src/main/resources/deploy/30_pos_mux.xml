@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- POS Channel Multiplexer Configuration -->
+<mux class="org.jpos.q2.iso.QMUX" logger="Q2" name="pos-mux">
+    <in>pos-receive</in>
+    <out>pos-send</out>
+    <unhandled>pos-unhandled</unhandled>
+    <key>11,37,41,42</key>
+    <ready>pos-channel.ready</ready>
+</mux>

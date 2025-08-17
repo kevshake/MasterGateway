@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Bank Channel Adapter Configuration -->
+<channel-adaptor name='bank-channel' logger="BANK">
+    <channel class="org.jpos.iso.channel.ASCIIChannel" 
+             packager="com.kevshake.gateway.packagers.BankPackager" 
+             header="">
+        <property name="host" value="192.168.1.100" />
+        <property name="port" value="8001" />
+        <property name="timeout" value="30000" />
+        <property name="keep-alive" value="true" />
+    </channel>
+
+    <in>bank-send</in>
+    <out>bank-receive</out>
+    <reconnect-delay>10000</reconnect-delay>
+</channel-adaptor>

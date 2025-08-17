@@ -1,4 +1,4 @@
-package com.kevshake.gateway.cmponents;
+package com.kevshake.gateway.components;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

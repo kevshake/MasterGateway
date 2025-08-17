@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Transaction Manager Configuration -->
+<txnmgr class="org.jpos.transaction.TransactionManager" logger="TXN" name="TXNMGR">
+    <property name="queue" value="TXNMGR"/>
+    <property name="sessions" value="1000"/>    
+    <property name="max-sessions" value="128000"/>
+    <property name="debug" value="true"/>
+
+    <!-- Transaction Participants -->
+    <participant class="org.jpos.transaction.participant.QueryHost"/>
+    <participant class="org.jpos.transaction.participant.SendResponse"/>
+</txnmgr>

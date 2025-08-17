@@ -7,3 +7,101 @@ iso8583:
     2: N
     3: ANS
     4: BINARY
+  
+  # POS Terminal Configuration (Incoming)
+  pos:
+    port: 8000
+    channel-type: NACC
+    packager: org.jpos.iso.packager.ISO87APackager
+    
+  # Bank Communication Configuration (Outgoing)
+  bank:
+    host: 192.168.1.100
+    port: 8001
+    channel-type: ASCII
+    packager: org.jpos.iso.packager.ISO87BPackager
+    timeout: 30000
+    max-connections: 5
+    
+    # Bank connection retry configuration
+    retry:
+      max-attempts: 3
+      delay-ms: 5000
+      backoff-multiplier: 2.0
+  
+  # Security Configuration for PIN Processing
+  security:
+    # Gateway Zonal PIN Key (Master Key for internal PIN processing)
+    gateway-zonal-key: 40763BB5B0B910B5CE3297E58967CD2A
+    
+    # Default Terminal PIN Key (used when terminal-specific key not found)
+    default-terminal-key: 9E4F7FF1F831F1132CD9B6C740B0134C
+    
+    # PIN processing settings
+    pin:
+      enable-transposition: true
+      validate-pin-blocks: true
+      log-pin-operations: true
+    
+    # Card validation settings
+    card:
+      enable-validation: true
+      reject-invalid-cards: true
+      log-validation-results: true
+  
+  # Terminal Management Configuration
+  terminal:
+    auto-create: true                    # Automatically create terminals on key change requests
+    enable-key-change: true              # Enable key change processing
+    key-length: 2                        # TDES key length (2=double, 3=triple)
+    key-expiry-days: 365                 # Key expiry period in days
+    log-key-operations: true             # Log all key operations
+
+# Spring Boot Configuration
+spring:
+  application:
+    name: ISO8583_MasterServer_Base-1
+  
+  # H2 In-Memory Database Configuration
+  datasource:
+    url: jdbc:h2:mem:terminaldb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+    
+  # H2 Console (for development/debugging)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+        trace: false
+  
+  # JPA/Hibernate Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update                   # Update schema without dropping
+    show-sql: false                      # Set to true for SQL debugging
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: false
+        generate_statistics: false
+        hbm2ddl:
+          auto: update
+        globally_quoted_identifiers: false
+        globally_quoted_identifiers_skip_column_definitions: true
+        
+  # Logging Configuration
+  logging:
+    level:
+      com.kevshake.gateway: INFO
+      org.springframework.orm.jpa: INFO
+      org.hibernate.SQL: WARN           # Set to DEBUG to see SQL queries
+      org.hibernate.type.descriptor.sql.BasicBinder: WARN
+      
+# Server Configuration
+server:
+  port: 8080                            # HTTP server port (for H2 console access)

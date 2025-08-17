@@ -1,4 +1,4 @@
-package com.kevshake.gateway.cmponents;
+package com.kevshake.gateway.components;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

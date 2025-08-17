@@ -1,4 +1,4 @@
-package com.kevshake.gateway.cmponents;
+package com.kevshake.gateway.components;
 
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOPackager;

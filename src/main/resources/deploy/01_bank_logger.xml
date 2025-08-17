@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Bank Communication Logger Configuration with Protected Logging -->
+<logger name="BANK" class="org.jpos.q2.qbean.LoggerAdaptor">
+    <!-- Protected Log Listener for masking sensitive fields -->
+    <log-listener class="org.jpos.util.ProtectedLogListener">
+        <!-- Protect PAN and Track 2 data -->
+        <property name="protect" value="2 35" />
+        <!-- Wipe EMV data and additional sensitive fields -->
+        <property name="wipe" value="52 45 55" />
+    </log-listener>
+    
+    <!-- Daily Log Listener with rotation -->
+    <log-listener class="org.jpos.util.DailyLogListener">
+        <property name="window" value="86400" /> <!-- 24 hours -->
+        <property name="prefix" value="logs/bank-comm" />
+        <property name="suffix" value=".log" />
+        <property name="date-format" value="_yyyy-MM-dd" />
+        <property name="compression-format" value="gzip" />
+        <property name="compressed-suffix" value=".gz" />
+        <property name="maxsize" value="52428800" /> <!-- 50MB -->
+    </log-listener>
+</logger>

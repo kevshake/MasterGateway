@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        
+        <!-- File Appender for Transaction Logs -->
+        <RollingFile name="TransactionFile" fileName="logs/transactions.log"
+                     filePattern="logs/transactions-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+        
+        <!-- File Appender for jPOS Logs -->
+        <RollingFile name="JPOSFile" fileName="logs/jpos.log"
+                     filePattern="logs/jpos-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+        
+        <!-- File Appender for Bank Communication Logs -->
+        <RollingFile name="BankCommFile" fileName="logs/bank-communication.log"
+                     filePattern="logs/bank-communication-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+    </Appenders>
+    
+    <Loggers>
+        <!-- jPOS specific loggers -->
+        <Logger name="org.jpos" level="INFO" additivity="false">
+            <AppenderRef ref="JPOSFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+        
+        <!-- Transaction processing loggers -->
+        <Logger name="com.kevshake.gateway.components.IsoServerHandler" level="INFO" additivity="false">
+            <AppenderRef ref="TransactionFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+        
+        <Logger name="com.kevshake.gateway.components.TransactionProcessor" level="INFO" additivity="false">
+            <AppenderRef ref="TransactionFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+        
+        <!-- Bank communication logger -->
+        <Logger name="com.kevshake.gateway.components.BankCommunicationProcessor" level="INFO" additivity="false">
+            <AppenderRef ref="BankCommFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+        
+        <!-- Root logger -->
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
