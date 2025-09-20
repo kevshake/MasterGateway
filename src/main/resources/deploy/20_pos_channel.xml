@@ -5,7 +5,7 @@
              packager="com.kevshake.gateway.packagers.POSPackager" 
              header="">
         <property name="host" value="0.0.0.0" />
-        <property name="port" value="8000" />
+        <property name="port" value="5878" />
         <property name="timeout" value="300000" />
         <property name="keep-alive" value="true" />
     </channel>

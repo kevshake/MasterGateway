@@ -2,7 +2,7 @@
 <jpos>
     <!-- POS Terminal Server Configuration -->
     <server class="org.jpos.q2.iso.QServer" logger="Q2" name="pos-server">
-        <attr name="port" type="java.lang.Integer">8000</attr>
+        <attr name="port" type="java.lang.Integer">5878</attr>
         <channel class="org.jpos.iso.channel.NACChannel" logger="Q2" 
                  name="pos-channel" packager="org.jpos.iso.packager.ISO87APackager">
             <property name="timeout" value="30000"/>

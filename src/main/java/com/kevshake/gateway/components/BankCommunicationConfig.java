@@ -16,7 +16,7 @@ public class BankCommunicationConfig {
     private Bank bank = new Bank();
     
     public static class Pos {
-        private int port = 8000;
+        private int port = 5878;
         private String channelType = "NACC";
         private String packager = "org.jpos.iso.packager.ISO87APackager";
         
