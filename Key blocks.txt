@@ -1,0 +1,167 @@
+Triple DES (TDES) Key Encryption and Block Handling
+1. Introduction
+
+	You're specifically asking about Triple DES (TDES) key encryption and whether keys are split into blocks during the encryption process. Based on my research, I can provide you with detailed information about how TDES keys are structured, encrypted, and wrapped.
+
+2. TDES Key Structure
+	2.1 Basic TDES Key Format
+		A Triple DES key consists of three DES keys combined:
+
+		Key 1: 64 bits (8 bytes) - first DES key
+		Key 2: 64 bits (8 bytes) - second DES key
+		Key 3: 64 bits (8 bytes) - third DES key
+		Total: 192 bits (24 bytes)
+
+	2.2 Key Types
+		Three-key TDES: All three keys are unique (K1 ≠ K2 ≠ K3)
+		Two-key TDES: K1 = K3, K2 is different (more common, 128-bit effective strength)
+	2.3 Parity Bits
+		Each DES key is 64 bits but only 56 bits are used for encryption - the remaining 8 bits are parity bits (1 per byte).
+
+3. TDES Block Size and Encryption
+	3.1 TDES Block Size
+		TDES operates on 64-bit (8-byte) blocks
+		This is inherited from the original DES algorithm
+		Data longer than 64 bits must be processed using a mode of operation (like CBC)
+	3.2 How TDES Keys Are Encrypted
+		Unlike AES key wrapping which splits keys into smaller blocks, TDES keys are typically encrypted as whole units using modes like CBC (Cipher Block Chaining).
+
+		The key insight is:
+
+			TDES itself processes data in 64-bit blocks
+			When encrypting a TDES key, the entire 24-byte key is encrypted
+			The CBC mode naturally handles the 64-bit block processing internally
+4. TDES Key Wrapping Standards
+	4.1 RFC 3217: Triple-DES Key Wrapping
+		This is the most common standard for wrapping TDES keys with other TDES keys.
+
+		Algorithm Steps:
+
+		Prepare the key: Set odd parity for each octet of the TDES key
+		Add checksum: Compute 8-byte SHA-1 checksum of the key
+		Combine: Key (24 bytes) + Checksum (8 bytes) = 32 bytes total
+		Encrypt: Use CBC mode with TDES to encrypt the combined data
+		Post-process: Byte reversal and additional encryption for security
+		
+	4.2 ANSI X9.24/TR-31 Key Blocks
+		These standards define structured formats for key blocks that include:
+
+		Header with key attributes
+		Encrypted key data
+		Integrity check (MAC)
+		The TDES key is encrypted within the key block structure, typically using CBC mode.
+		
+5. Block Processing During TDES Key Encryption
+	5.1 How 64-bit Blocks Are Handled
+		When a 24-byte TDES key is encrypted using CBC mode:
+
+			24-byte TDES key + 8-byte checksum = 32 bytes total
+			32 bytes = 4 × 64-bit blocks
+
+		CBC mode processes these blocks sequentially:
+		Block 1 (bytes 1-8)  → Encrypt → IV for next block
+		Block 2 (bytes 9-16) → Encrypt → IV for next block  
+		Block 3 (bytes 17-24) → Encrypt → IV for next block
+		Block 4 (bytes 25-32) → Encrypt → Final block
+	5.2 Why Keys Aren't Split Like AES
+		AES key wrapping: Splits keys into 64-bit blocks for specialized processing
+		TDES key wrapping: Uses standard block cipher modes (CBC) that handle blocks internally
+		No need for manual splitting: CBC mode automatically processes data in 64-bit blocks
+6. Pseudocode for TDES Key Wrapping
+	6.1 RFC 3217 TDES Key Wrap Algorithm
+		function wrapTDESKey(kek, tdesKey):
+			// Step 1: Set odd parity for each octet in the TDES key
+			cek = setOddParity(tdesKey)
+			
+			// Step 2: Compute 8-byte checksum using SHA-1
+			icv = computeChecksum(cek)  // First 8 bytes of SHA-1 hash
+			
+			// Step 3: Combine key and checksum
+			cekicv = cek || icv  // 24 + 8 = 32 bytes
+			
+			// Step 4: Generate random IV (8 bytes)
+			iv = generateRandomBytes(8)
+			
+			// Step 5: Encrypt CEKICV in CBC mode using KEK
+			temp1 = tdes_cbc_encrypt(kek, cekicv, iv)
+			
+			// Step 6: Prepend IV to ciphertext
+			temp2 = iv || temp1
+			
+			// Step 7: Reverse all bytes
+			temp3 = reverseBytes(temp2)
+			
+			// Step 8: Encrypt again with fixed IV
+			final_iv = 0x4adda22c79e82105  // Fixed IV for second encryption
+			wrapped_key = tdes_cbc_encrypt(kek, temp3, final_iv)
+			
+			return wrapped_key  // 40 bytes total
+	6.2 TDES Key Unwrap Algorithm
+
+		function unwrapTDESKey(kek, wrappedKey):
+			// Step 1: Check length (must be 40 bytes)
+			if length(wrappedKey) != 40:
+				error("Invalid wrapped key length")
+			
+			// Step 2: Decrypt with fixed IV
+			final_iv = 0x4adda22c79e82105
+			temp3 = tdes_cbc_decrypt(kek, wrappedKey, final_iv)
+			
+			// Step 3: Reverse bytes
+			temp2 = reverseBytes(temp3)
+			
+			// Step 4: Split into IV and ciphertext
+			iv = temp2[0:8]      // First 8 bytes
+			temp1 = temp2[8:40]  // Remaining 32 bytes
+			
+			// Step 5: Decrypt ciphertext
+			cekicv = tdes_cbc_decrypt(kek, temp1, iv)
+			
+			// Step 6: Split into key and checksum
+			cek = cekicv[0:24]   // First 24 bytes
+			icv = cekicv[24:32]  // Last 8 bytes
+			
+			// Step 7: Verify checksum
+			computed_icv = computeChecksum(cek)
+			if icv != computed_icv:
+				error("Checksum verification failed")
+			
+			// Step 8: Verify odd parity
+			if not verifyOddParity(cek):
+				error("Parity verification failed")
+			
+			return cek  // Return unwrapped TDES key
+			
+	6.3 Simplified TDES CBC Encryption (for illustration)
+
+		function tdes_cbc_encrypt(key, plaintext, iv):
+			// TDES operates on 64-bit blocks
+			blocks = splitInto64BitBlocks(plaintext)
+			ciphertext = empty
+			current_iv = iv
+			
+			for each block in blocks:
+				// XOR with IV (for first block) or previous ciphertext
+				input_block = block XOR current_iv
+				
+				// Encrypt with TDES
+				encrypted_block = tdes_encrypt(key, input_block)
+				
+				// Append to result
+				ciphertext = ciphertext || encrypted_block
+				
+				// Current ciphertext becomes next IV
+				current_iv = encrypted_block
+			
+			return ciphertext
+		
+	7. Key Points Summary
+		TDES keys are 24 bytes (192 bits) consisting of three 64-bit DES keys
+		TDES operates on 64-bit blocks - this is the fundamental block size
+		Keys are NOT manually split like in AES key wrapping
+		CBC mode handles block processing automatically - it processes the 24-byte key + checksum as four 64-bit blocks
+		RFC 3217 is the standard for TDES key wrapping
+		The process involves:
+		Adding an integrity checksum
+		Encrypting with CBC mode
+		Byte reversal and additional encryption for security
