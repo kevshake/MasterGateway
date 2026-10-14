@@ -140,6 +140,7 @@ public class POSPackager extends ISOBasePackager {
         /*128*/ new IFB_BINARY(16, "Message authentication code field")
     };
     
+    /** Executes the POSPackager gateway operation. */
     public POSPackager() {
         super();
         setFieldPackager(fld);

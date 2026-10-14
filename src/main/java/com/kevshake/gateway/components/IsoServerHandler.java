@@ -53,6 +53,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
     private boolean enableKeyChange;
     
     @Override
+    /** Executes the channelRead0 gateway operation. */
     protected void channelRead0(ChannelHandlerContext ctx, ISOMsg msg) {
         try {
             // Get MTI (Message Type Indicator)
@@ -156,6 +157,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Executes the handleAuthorizationRequest gateway operation. */
     private void handleAuthorizationRequest(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Authorization Request");
         
@@ -200,6 +202,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Executes the handlePosAuthorization gateway operation. */
     private void handlePosAuthorization(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing POS Authorization Request");
         
@@ -232,6 +235,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Executes the handleReversalRequest gateway operation. */
     private void handleReversalRequest(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Reversal Request");
         
@@ -260,6 +264,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Executes the handleAuthorizationAdvice gateway operation. */
     private void handleAuthorizationAdvice(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Authorization Advice");
         
@@ -273,6 +278,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         processAdvice(msg);
     }
 
+    /** Executes the handleReversalAdvice gateway operation. */
     private void handleReversalAdvice(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Reversal Advice");
         
@@ -283,6 +289,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         processReversalAdvice(msg);
     }
 
+    /** Executes the handleNetworkManagement gateway operation. */
     private void handleNetworkManagement(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Network Management Request");
         
@@ -468,11 +475,13 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Executes the handleUnsupportedMessage gateway operation. */
     private void handleUnsupportedMessage(ChannelHandlerContext ctx, ISOMsg msg) {
         log.warn("Unsupported message type");
         sendErrorResponse(ctx, msg, "12"); // Invalid Transaction
     }
 
+    /** Executes the handleError gateway operation. */
     private void handleError(ChannelHandlerContext ctx, ISOMsg msg, Exception e) {
         log.error("General error handling message", e);
         sendErrorResponse(ctx, msg, "96"); // System Error
@@ -498,11 +507,13 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Executes the processPosTransaction gateway operation. */
     private String processPosTransaction(String processingCode, String amount, String pan) {
         // POS-specific transaction processing
         return processTransaction(processingCode, amount, pan);
     }
 
+    /** Executes the processPurchase gateway operation. */
     private String processPurchase(String amount, String pan) {
         // Sample purchase logic
         if (amount != null && Long.parseLong(amount) > 100000) { // Amount over 1000.00
@@ -511,6 +522,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         return "00"; // Approved
     }
 
+    /** Executes the processCashAdvance gateway operation. */
     private String processCashAdvance(String amount, String pan) {
         // Sample cash advance logic
         if (amount != null && Long.parseLong(amount) > 50000) { // Amount over 500.00
@@ -519,27 +531,32 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         return "00"; // Approved
     }
 
+    /** Executes the processRefund gateway operation. */
     private String processRefund(String amount, String pan) {
         // Sample refund logic
         return "00"; // Approved
     }
 
+    /** Executes the processBalanceInquiry gateway operation. */
     private String processBalanceInquiry(String pan) {
         // Sample balance inquiry logic
         return "00"; // Approved
     }
 
+    /** Executes the processReversal gateway operation. */
     private boolean processReversal(String originalStan, String originalDate, String amount) {
         // Sample reversal processing
         log.info("Processing reversal for STAN: {}, Date: {}", originalStan, originalDate);
         return true; // Assume successful
     }
 
+    /** Executes the processAdvice gateway operation. */
     private void processAdvice(ISOMsg msg) {
         // Process advice message (logging, database updates, etc.)
         log.info("Advice processed");
     }
 
+    /** Executes the processReversalAdvice gateway operation. */
     private void processReversalAdvice(ISOMsg msg) {
         // Process reversal advice
         log.info("Reversal advice processed");
@@ -561,6 +578,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Executes the sendErrorResponse gateway operation. */
     private void sendErrorResponse(ChannelHandlerContext ctx, ISOMsg request, String responseCode) {
         try {
             String requestMti = request.getString(0);
@@ -606,6 +624,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Returns the response mti. */
     private String getResponseMti(String requestMti) {
         // Convert request MTI to response MTI
         switch (requestMti) {
@@ -617,16 +636,19 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Executes the generateRRN gateway operation. */
     private String generateRRN() {
         // Generate Retrieval Reference Number
         return String.format("%012d", System.currentTimeMillis() % 1000000000000L);
     }
 
+    /** Executes the generateAuthCode gateway operation. */
     private String generateAuthCode() {
         // Generate Authorization Code
         return String.format("%06d", (int) (Math.random() * 1000000));
     }
 
+    /** Executes the maskPan gateway operation. */
     private String maskPan(String pan) {
         if (pan == null || pan.length() < 8) return "****";
         return pan.substring(0, 4) + "****" + pan.substring(pan.length() - 4);

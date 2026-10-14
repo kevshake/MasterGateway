@@ -12,11 +12,13 @@ public class IsoMessageDecoder extends ByteToMessageDecoder {
     @SuppressWarnings("unused")
 	private final ISOPackager packager;
 
+    /** Executes the IsoMessageDecoder gateway operation. */
     public IsoMessageDecoder(ISOPackager packager) {
         this.packager = packager;
     }
 
     @Override
+    /** Executes the decode gateway operation. */
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (in.readableBytes() < 2) {
             return;

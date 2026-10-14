@@ -103,6 +103,7 @@ public class TransactionProcessor {
         }
     }
     
+    /** Executes the processTransactionByType gateway operation. */
     private String processTransactionByType(String processingCode, String pan, String amount, ISOMsg msg) {
         switch (processingCode) {
             case ProcessingCodes.PURCHASE:
@@ -129,6 +130,7 @@ public class TransactionProcessor {
         }
     }
     
+    /** Executes the processPurchaseTransaction gateway operation. */
     private String processPurchaseTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing purchase transaction");
         
@@ -167,6 +169,7 @@ public class TransactionProcessor {
         return ResponseCodes.APPROVED;
     }
     
+    /** Executes the processCashAdvanceTransaction gateway operation. */
     private String processCashAdvanceTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing cash advance transaction");
         
@@ -192,6 +195,7 @@ public class TransactionProcessor {
         return ResponseCodes.APPROVED;
     }
     
+    /** Executes the processRefundTransaction gateway operation. */
     private String processRefundTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing refund transaction");
         
@@ -209,6 +213,7 @@ public class TransactionProcessor {
         return ResponseCodes.APPROVED;
     }
     
+    /** Executes the processBalanceInquiryTransaction gateway operation. */
     private String processBalanceInquiryTransaction(String pan, ISOMsg msg) {
         log.info("Processing balance inquiry transaction");
         
@@ -220,6 +225,7 @@ public class TransactionProcessor {
         return ResponseCodes.APPROVED;
     }
     
+    /** Executes the processPaymentTransaction gateway operation. */
     private String processPaymentTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing payment transaction");
         
@@ -240,6 +246,7 @@ public class TransactionProcessor {
         return ResponseCodes.APPROVED;
     }
     
+    /** Executes the processTransferTransaction gateway operation. */
     private String processTransferTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing transfer transaction");
         
@@ -297,6 +304,7 @@ public class TransactionProcessor {
         }
     }
     
+    /** Executes the processSignOn gateway operation. */
     private String processSignOn(ISOMsg msg) {
         log.info("Processing sign-on request");
         
@@ -309,6 +317,7 @@ public class TransactionProcessor {
         return ResponseCodes.APPROVED;
     }
     
+    /** Executes the processSignOff gateway operation. */
     private String processSignOff(ISOMsg msg) {
         log.info("Processing sign-off request");
         
@@ -318,6 +327,7 @@ public class TransactionProcessor {
         return ResponseCodes.APPROVED;
     }
     
+    /** Executes the processEchoTest gateway operation. */
     private String processEchoTest(ISOMsg msg) {
         log.info("Processing echo test");
         return ResponseCodes.APPROVED;
@@ -365,17 +375,20 @@ public class TransactionProcessor {
         return pan.startsWith("4") || pan.startsWith("5") || pan.startsWith("6"); // Visa, MC, Discover
     }
     
+    /** Executes the hasSufficientBalance gateway operation. */
     private boolean hasSufficientBalance(String pan, long amount) {
         // Sample balance check logic
         // In real implementation, check against account balance
         return amount <= 200000; // Sample limit of $2000
     }
     
+    /** Executes the hasCashAdvanceLimit gateway operation. */
     private boolean hasCashAdvanceLimit(String pan, long amount) {
         // Sample cash advance limit check
         return amount <= 50000; // Sample limit of $500
     }
     
+    /** Indicates whether restricted merchant. */
     private boolean isRestrictedMerchant(String merchantCategory) {
         // Sample merchant restriction logic
         if (merchantCategory == null) return false;
@@ -384,21 +397,25 @@ public class TransactionProcessor {
         return "7995".equals(merchantCategory);
     }
     
+    /** Indicates whether valid destination account. */
     private boolean isValidDestinationAccount(String account) {
         // Sample destination account validation
         return account != null && account.length() >= 10;
     }
     
+    /** Indicates whether duplicate transaction. */
     private boolean isDuplicateTransaction(String stan, String date) {
         String key = stan + "_" + date;
         return transactionDatabase.containsKey(key);
     }
     
+    /** Executes the hasOriginalTransaction gateway operation. */
     private boolean hasOriginalTransaction(String rrn) {
         return transactionDatabase.values().stream()
                 .anyMatch(t -> rrn.equals(t.getRrn()));
     }
     
+    /** Executes the storeTransaction gateway operation. */
     private void storeTransaction(ISOMsg msg, String responseCode) {
         try {
             String key = msg.getString(11) + "_" + msg.getString(13);
@@ -421,11 +438,13 @@ public class TransactionProcessor {
         }
     }
     
+    /** Executes the findOriginalTransaction gateway operation. */
     private TransactionRecord findOriginalTransaction(String stan, String date) {
         String key = stan + "_" + date;
         return transactionDatabase.get(key);
     }
     
+    /** Executes the reverseTransaction gateway operation. */
     private boolean reverseTransaction(TransactionRecord original) {
         // Sample reversal logic
         log.info("Reversing transaction: STAN={}, Amount={}", 
@@ -437,11 +456,13 @@ public class TransactionProcessor {
         return true;
     }
     
+    /** Executes the maskPan gateway operation. */
     private String maskPan(String pan) {
         if (pan == null || pan.length() < 8) return "****";
         return pan.substring(0, 4) + "****" + pan.substring(pan.length() - 4);
     }
     
+    /** Executes the generateRRN gateway operation. */
     private String generateRRN() {
         return String.format("%012d", System.currentTimeMillis() % 1000000000000L);
     }
@@ -461,33 +482,52 @@ public class TransactionProcessor {
         
         // Getters and setters
         public String getStan() { return stan; }
+    /** Sets the stan. */
         public void setStan(String stan) { this.stan = stan; }
         
+    /** Returns the date. */
         public String getDate() { return date; }
+    /** Sets the date. */
         public void setDate(String date) { this.date = date; }
         
+    /** Returns the time. */
         public String getTime() { return time; }
+    /** Sets the time. */
         public void setTime(String time) { this.time = time; }
         
+    /** Returns the pan. */
         public String getPan() { return pan; }
+    /** Sets the pan. */
         public void setPan(String pan) { this.pan = pan; }
         
+    /** Returns the amount. */
         public String getAmount() { return amount; }
+    /** Sets the amount. */
         public void setAmount(String amount) { this.amount = amount; }
         
+    /** Returns the processing code. */
         public String getProcessingCode() { return processingCode; }
+    /** Sets the processing code. */
         public void setProcessingCode(String processingCode) { this.processingCode = processingCode; }
         
+    /** Returns the response code. */
         public String getResponseCode() { return responseCode; }
+    /** Sets the response code. */
         public void setResponseCode(String responseCode) { this.responseCode = responseCode; }
         
+    /** Returns the rrn. */
         public String getRrn() { return rrn; }
+    /** Sets the rrn. */
         public void setRrn(String rrn) { this.rrn = rrn; }
         
+    /** Returns the timestamp. */
         public LocalDateTime getTimestamp() { return timestamp; }
+    /** Sets the timestamp. */
         public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
         
+    /** Indicates whether reversed. */
         public boolean isReversed() { return reversed; }
+    /** Sets the reversed. */
         public void setReversed(boolean reversed) { this.reversed = reversed; }
     }
 }

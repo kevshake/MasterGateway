@@ -400,12 +400,17 @@ public class BankResponseCodeService {
 
         // Getters
         public String getCode() { return code; }
+    /** Returns the description. */
         public String getDescription() { return description; }
+    /** Returns the severity. */
         public BankResponseSeverity getSeverity() { return severity; }
+    /** Returns the category. */
         public BankResponseCategory getCategory() { return category; }
+    /** Returns the recommended action. */
         public String getRecommendedAction() { return recommendedAction; }
 
         @Override
+    /** Executes the toString gateway operation. */
         public String toString() {
             return String.format("BankResponseCode{code='%s', description='%s', severity=%s, category=%s, action='%s'}", 
                                code, description, severity, category, recommendedAction);
@@ -424,6 +429,7 @@ public class BankResponseCodeService {
             getBankResponseDescription(responseCode),
             getBankResponseSeverity(responseCode),
             getBankResponseCategory(responseCode),
+    /** Returns the recommended action. */
             getRecommendedAction(responseCode)
         );
     }

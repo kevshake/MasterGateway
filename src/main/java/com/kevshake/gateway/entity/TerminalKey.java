@@ -65,6 +65,7 @@ public class TerminalKey {
     // Constructors
     public TerminalKey() {}
 
+    /** Executes the TerminalKey gateway operation. */
     public TerminalKey(String keyValue, String keyType, Integer keyLength) {
         this.keyValue = keyValue;
         this.keyType = keyType;
@@ -82,10 +83,12 @@ public class TerminalKey {
 
         private final String description;
 
+    /** Executes the KeyStatus gateway operation. */
         KeyStatus(String description) {
             this.description = description;
         }
 
+    /** Returns the description. */
         public String getDescription() {
             return description;
         }
@@ -96,86 +99,107 @@ public class TerminalKey {
         return keyId;
     }
 
+    /** Sets the key id. */
     public void setKeyId(Long keyId) {
         this.keyId = keyId;
     }
 
+    /** Returns the key value. */
     public String getKeyValue() {
         return keyValue;
     }
 
+    /** Sets the key value. */
     public void setKeyValue(String keyValue) {
         this.keyValue = keyValue;
     }
 
+    /** Returns the key type. */
     public String getKeyType() {
         return keyType;
     }
 
+    /** Sets the key type. */
     public void setKeyType(String keyType) {
         this.keyType = keyType;
     }
 
+    /** Returns the key status. */
     public KeyStatus getKeyStatus() {
         return keyStatus;
     }
 
+    /** Sets the key status. */
     public void setKeyStatus(KeyStatus keyStatus) {
         this.keyStatus = keyStatus;
     }
 
+    /** Returns the key check value. */
     public String getKeyCheckValue() {
         return keyCheckValue;
     }
 
+    /** Sets the key check value. */
     public void setKeyCheckValue(String keyCheckValue) {
         this.keyCheckValue = keyCheckValue;
     }
 
+    /** Returns the key length. */
     public Integer getKeyLength() {
         return keyLength;
     }
 
+    /** Sets the key length. */
     public void setKeyLength(Integer keyLength) {
         this.keyLength = keyLength;
     }
 
+    /** Returns the created date. */
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
+    /** Sets the created date. */
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
+    /** Returns the updated date. */
     public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
 
+    /** Sets the updated date. */
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
 
+    /** Returns the expiry date. */
     public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
 
+    /** Sets the expiry date. */
     public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
     }
 
+    /** Returns the notes. */
     public String getNotes() {
         return notes;
     }
 
+    /** Sets the notes. */
     public void setNotes(String notes) {
         this.notes = notes;
     }
 
+    /** Returns the terminal. */
     public Terminal getTerminal() {
         return terminal;
     }
 
+    /** Sets the terminal. */
     public void setTerminal(Terminal terminal) {
         this.terminal = terminal;
     }
@@ -185,23 +209,28 @@ public class TerminalKey {
         return keyStatus == KeyStatus.ACTIVE;
     }
 
+    /** Indicates whether expired. */
     public boolean isExpired() {
         return keyStatus == KeyStatus.EXPIRED || 
                (expiryDate != null && expiryDate.isBefore(LocalDateTime.now()));
     }
 
+    /** Executes the activate gateway operation. */
     public void activate() {
         this.keyStatus = KeyStatus.ACTIVE;
     }
 
+    /** Executes the deactivate gateway operation. */
     public void deactivate() {
         this.keyStatus = KeyStatus.INACTIVE;
     }
 
+    /** Executes the expire gateway operation. */
     public void expire() {
         this.keyStatus = KeyStatus.EXPIRED;
     }
 
+    /** Executes the markCompromised gateway operation. */
     public void markCompromised() {
         this.keyStatus = KeyStatus.COMPROMISED;
     }
@@ -215,6 +244,7 @@ public class TerminalKey {
     }
 
     @Override
+    /** Executes the equals gateway operation. */
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -223,11 +253,13 @@ public class TerminalKey {
     }
 
     @Override
+    /** Executes the hashCode gateway operation. */
     public int hashCode() {
         return Objects.hash(keyId);
     }
 
     @Override
+    /** Executes the toString gateway operation. */
     public String toString() {
         return "TerminalKey{" +
                 "keyId=" + keyId +

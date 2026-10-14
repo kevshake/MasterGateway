@@ -25,6 +25,7 @@ public class Q2IntegrationService {
     private Thread q2Thread;
     
     @PostConstruct
+    /** Executes the startQ2 gateway operation. */
     public void startQ2() {
         try {
             // Create deploy directory if it doesn't exist
@@ -43,6 +44,7 @@ public class Q2IntegrationService {
     }
     
     @PreDestroy
+    /** Executes the stopQ2 gateway operation. */
     public void stopQ2() {
         try {
             if (q2 != null) {

@@ -86,12 +86,14 @@ public class Terminal {
     // Constructors
     public Terminal() {}
 
+    /** Executes the Terminal gateway operation. */
     public Terminal(String terminalId) {
         this.terminalId = terminalId;
         this.status = TerminalStatus.ACTIVE;
         this.keyChangeCount = 0;
     }
 
+    /** Executes the Terminal gateway operation. */
     public Terminal(String terminalId, String merchantId) {
         this(terminalId);
         this.merchantId = merchantId;
@@ -107,10 +109,12 @@ public class Terminal {
 
         private final String description;
 
+    /** Executes the TerminalStatus gateway operation. */
         TerminalStatus(String description) {
             this.description = description;
         }
 
+    /** Returns the description. */
         public String getDescription() {
             return description;
         }
@@ -121,126 +125,157 @@ public class Terminal {
         return id;
     }
 
+    /** Sets the id. */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /** Returns the terminal id. */
     public String getTerminalId() {
         return terminalId;
     }
 
+    /** Sets the terminal id. */
     public void setTerminalId(String terminalId) {
         this.terminalId = terminalId;
     }
 
+    /** Returns the merchant id. */
     public String getMerchantId() {
         return merchantId;
     }
 
+    /** Sets the merchant id. */
     public void setMerchantId(String merchantId) {
         this.merchantId = merchantId;
     }
 
+    /** Returns the terminal name. */
     public String getTerminalName() {
         return terminalName;
     }
 
+    /** Sets the terminal name. */
     public void setTerminalName(String terminalName) {
         this.terminalName = terminalName;
     }
 
+    /** Returns the location. */
     public String getLocation() {
         return location;
     }
 
+    /** Sets the location. */
     public void setLocation(String location) {
         this.location = location;
     }
 
+    /** Returns the status. */
     public TerminalStatus getStatus() {
         return status;
     }
 
+    /** Sets the status. */
     public void setStatus(TerminalStatus status) {
         this.status = status;
     }
 
+    /** Returns the terminal type. */
     public String getTerminalType() {
         return terminalType;
     }
 
+    /** Sets the terminal type. */
     public void setTerminalType(String terminalType) {
         this.terminalType = terminalType;
     }
 
+    /** Returns the serial number. */
     public String getSerialNumber() {
         return serialNumber;
     }
 
+    /** Sets the serial number. */
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 
+    /** Returns the software version. */
     public String getSoftwareVersion() {
         return softwareVersion;
     }
 
+    /** Sets the software version. */
     public void setSoftwareVersion(String softwareVersion) {
         this.softwareVersion = softwareVersion;
     }
 
+    /** Returns the created date. */
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
+    /** Sets the created date. */
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
+    /** Returns the updated date. */
     public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
 
+    /** Sets the updated date. */
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
 
+    /** Returns the last activity date. */
     public LocalDateTime getLastActivityDate() {
         return lastActivityDate;
     }
 
+    /** Sets the last activity date. */
     public void setLastActivityDate(LocalDateTime lastActivityDate) {
         this.lastActivityDate = lastActivityDate;
     }
 
+    /** Returns the key change count. */
     public Integer getKeyChangeCount() {
         return keyChangeCount;
     }
 
+    /** Sets the key change count. */
     public void setKeyChangeCount(Integer keyChangeCount) {
         this.keyChangeCount = keyChangeCount;
     }
 
+    /** Returns the last key change date. */
     public LocalDateTime getLastKeyChangeDate() {
         return lastKeyChangeDate;
     }
 
+    /** Sets the last key change date. */
     public void setLastKeyChangeDate(LocalDateTime lastKeyChangeDate) {
         this.lastKeyChangeDate = lastKeyChangeDate;
     }
 
+    /** Returns the notes. */
     public String getNotes() {
         return notes;
     }
 
+    /** Sets the notes. */
     public void setNotes(String notes) {
         this.notes = notes;
     }
 
+    /** Returns the terminal key. */
     public TerminalKey getTerminalKey() {
         return terminalKey;
     }
 
+    /** Sets the terminal key. */
     public void setTerminalKey(TerminalKey terminalKey) {
         this.terminalKey = terminalKey;
         if (terminalKey != null) {
@@ -253,39 +288,48 @@ public class Terminal {
         return status == TerminalStatus.ACTIVE;
     }
 
+    /** Executes the canProcessTransactions gateway operation. */
     public boolean canProcessTransactions() {
         return status == TerminalStatus.ACTIVE && hasValidKey();
     }
 
+    /** Executes the hasValidKey gateway operation. */
     public boolean hasValidKey() {
         return terminalKey != null && terminalKey.isActive() && !terminalKey.isExpired();
     }
 
+    /** Executes the updateLastActivity gateway operation. */
     public void updateLastActivity() {
         this.lastActivityDate = LocalDateTime.now();
     }
 
+    /** Executes the incrementKeyChangeCount gateway operation. */
     public void incrementKeyChangeCount() {
         this.keyChangeCount = (this.keyChangeCount == null) ? 1 : this.keyChangeCount + 1;
         this.lastKeyChangeDate = LocalDateTime.now();
     }
 
+    /** Executes the activate gateway operation. */
     public void activate() {
         this.status = TerminalStatus.ACTIVE;
     }
 
+    /** Executes the deactivate gateway operation. */
     public void deactivate() {
         this.status = TerminalStatus.INACTIVE;
     }
 
+    /** Executes the suspend gateway operation. */
     public void suspend() {
         this.status = TerminalStatus.SUSPENDED;
     }
 
+    /** Sets the maintenance. */
     public void setMaintenance() {
         this.status = TerminalStatus.MAINTENANCE;
     }
 
+    /** Executes the decommission gateway operation. */
     public void decommission() {
         this.status = TerminalStatus.DECOMMISSIONED;
         if (terminalKey != null) {
@@ -301,6 +345,7 @@ public class Terminal {
         return terminalId;
     }
 
+    /** Returns the key info. */
     public String getKeyInfo() {
         if (terminalKey == null) {
             return "No key assigned";
@@ -311,6 +356,7 @@ public class Terminal {
     }
 
     @Override
+    /** Executes the equals gateway operation. */
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -319,11 +365,13 @@ public class Terminal {
     }
 
     @Override
+    /** Executes the hashCode gateway operation. */
     public int hashCode() {
         return Objects.hash(terminalId);
     }
 
     @Override
+    /** Executes the toString gateway operation. */
     public String toString() {
         return "Terminal{" +
                 "id=" + id +

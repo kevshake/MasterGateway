@@ -374,6 +374,7 @@ public class ResponseCodeService {
         private final ResponseSeverity severity;
         private final ResponseCategory category;
 
+    /** Executes the ResponseCodeInfo gateway operation. */
         public ResponseCodeInfo(String code, String description, ResponseSeverity severity, ResponseCategory category) {
             this.code = code;
             this.description = description;
@@ -383,11 +384,15 @@ public class ResponseCodeService {
 
         // Getters
         public String getCode() { return code; }
+    /** Returns the description. */
         public String getDescription() { return description; }
+    /** Returns the severity. */
         public ResponseSeverity getSeverity() { return severity; }
+    /** Returns the category. */
         public ResponseCategory getCategory() { return category; }
 
         @Override
+    /** Executes the toString gateway operation. */
         public String toString() {
             return String.format("ResponseCode{code='%s', description='%s', severity=%s, category=%s}", 
                                code, description, severity, category);
@@ -405,6 +410,7 @@ public class ResponseCodeService {
             responseCode,
             getResponseDescription(responseCode),
             getResponseSeverity(responseCode),
+    /** Returns the response category. */
             getResponseCategory(responseCode)
         );
     }

@@ -101,7 +101,35 @@ spring:
       org.springframework.orm.jpa: INFO
       org.hibernate.SQL: WARN           # Set to DEBUG to see SQL queries
       org.hibernate.type.descriptor.sql.BasicBinder: WARN
+
+  security:
+    user:
+      name: gateway-admin
+      password: ${GATEWAY_ADMIN_PASSWORD:change-me-local}
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+    generator:
+      write-bigdecimal-as-plain: true
       
 # Server Configuration
 server:
   port: 8080                            # HTTP server port (for H2 console access)
+
+# Outbound HTTP client timeouts (WebClient)
+gateway:
+  http:
+    connect-timeout-ms: 5000
+    read-timeout-ms: 30000
+
+# Actuator: health status only for anonymous callers
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      show-components: never

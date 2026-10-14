@@ -390,12 +390,14 @@ public class TerminalManagementService {
         private TerminalKey terminalKey;
         private LocalDateTime timestamp;
 
+    /** Executes the KeyChangeResult gateway operation. */
         private KeyChangeResult(boolean success, String message) {
             this.success = success;
             this.message = message;
             this.timestamp = LocalDateTime.now();
         }
 
+    /** Executes the success gateway operation. */
         public static KeyChangeResult success(Terminal terminal, TerminalKey key) {
             KeyChangeResult result = new KeyChangeResult(true, "Key change completed successfully");
             result.terminal = terminal;
@@ -403,18 +405,24 @@ public class TerminalManagementService {
             return result;
         }
 
+    /** Executes the failure gateway operation. */
         public static KeyChangeResult failure(String message) {
             return new KeyChangeResult(false, message);
         }
 
         // Getters
         public boolean isSuccess() { return success; }
+    /** Returns the message. */
         public String getMessage() { return message; }
+    /** Returns the terminal. */
         public Terminal getTerminal() { return terminal; }
+    /** Returns the terminal key. */
         public TerminalKey getTerminalKey() { return terminalKey; }
+    /** Returns the timestamp. */
         public LocalDateTime getTimestamp() { return timestamp; }
 
         @Override
+    /** Executes the toString gateway operation. */
         public String toString() {
             return "KeyChangeResult{" +
                     "success=" + success +
@@ -445,36 +453,56 @@ public class TerminalManagementService {
 
         // Getters and Setters
         public long getTotalTerminals() { return totalTerminals; }
+    /** Sets the total terminals. */
         public void setTotalTerminals(long totalTerminals) { this.totalTerminals = totalTerminals; }
 
+    /** Returns the active terminals. */
         public long getActiveTerminals() { return activeTerminals; }
+    /** Sets the active terminals. */
         public void setActiveTerminals(long activeTerminals) { this.activeTerminals = activeTerminals; }
 
+    /** Returns the inactive terminals. */
         public long getInactiveTerminals() { return inactiveTerminals; }
+    /** Sets the inactive terminals. */
         public void setInactiveTerminals(long inactiveTerminals) { this.inactiveTerminals = inactiveTerminals; }
 
+    /** Returns the suspended terminals. */
         public long getSuspendedTerminals() { return suspendedTerminals; }
+    /** Sets the suspended terminals. */
         public void setSuspendedTerminals(long suspendedTerminals) { this.suspendedTerminals = suspendedTerminals; }
 
+    /** Returns the terminals with keys. */
         public long getTerminalsWithKeys() { return terminalsWithKeys; }
+    /** Sets the terminals with keys. */
         public void setTerminalsWithKeys(long terminalsWithKeys) { this.terminalsWithKeys = terminalsWithKeys; }
 
+    /** Returns the terminals without keys. */
         public long getTerminalsWithoutKeys() { return terminalsWithoutKeys; }
+    /** Sets the terminals without keys. */
         public void setTerminalsWithoutKeys(long terminalsWithoutKeys) { this.terminalsWithoutKeys = terminalsWithoutKeys; }
 
+    /** Returns the terminals with expired keys. */
         public long getTerminalsWithExpiredKeys() { return terminalsWithExpiredKeys; }
+    /** Sets the terminals with expired keys. */
         public void setTerminalsWithExpiredKeys(long terminalsWithExpiredKeys) { this.terminalsWithExpiredKeys = terminalsWithExpiredKeys; }
 
+    /** Returns the total keys. */
         public long getTotalKeys() { return totalKeys; }
+    /** Sets the total keys. */
         public void setTotalKeys(long totalKeys) { this.totalKeys = totalKeys; }
 
+    /** Returns the active keys. */
         public long getActiveKeys() { return activeKeys; }
+    /** Sets the active keys. */
         public void setActiveKeys(long activeKeys) { this.activeKeys = activeKeys; }
 
+    /** Returns the expired keys. */
         public long getExpiredKeys() { return expiredKeys; }
+    /** Sets the expired keys. */
         public void setExpiredKeys(long expiredKeys) { this.expiredKeys = expiredKeys; }
 
         @Override
+    /** Executes the toString gateway operation. */
         public String toString() {
             return "TerminalStatistics{" +
                     "totalTerminals=" + totalTerminals +

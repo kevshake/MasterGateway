@@ -2,7 +2,7 @@ package com.kevshake.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = "com.kevshake.gateway.entity")
 public class Iso8583MasterServerBase1Application {
 
+	/** Bootstraps the ISO8583 master gateway Spring application. */
 	public static void main(String[] args) {
 		SpringApplication.run(Iso8583MasterServerBase1Application.class, args);
 	}

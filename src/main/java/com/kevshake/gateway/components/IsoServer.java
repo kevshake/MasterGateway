@@ -41,6 +41,7 @@ public class IsoServer {
     private ChannelFuture serverFuture;
 
     @PostConstruct
+    /** Executes the startServer gateway operation. */
     public void startServer() {
         // Start server in a separate thread to avoid blocking Spring startup
         new Thread(() -> {
@@ -52,6 +53,7 @@ public class IsoServer {
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
+    /** Executes the initChannel gateway operation. */
                     protected void initChannel(SocketChannel ch) {
                         ch.pipeline()
                             .addLast(new LengthFieldBasedFrameDecoder(10240, 0, 2, 0, 2))
@@ -86,6 +88,7 @@ public class IsoServer {
     }
     
     @PreDestroy
+    /** Executes the shutdown gateway operation. */
     public void shutdown() {
         log.info("Shutting down ISO8583 Server");
         

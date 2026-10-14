@@ -7,7 +7,7 @@ import javax.crypto.SecretKey;
 
 //Java code for the above approach
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.codec.binary.Hex;
 
 import java.security.NoSuchAlgorithmException;
@@ -235,6 +235,7 @@ public class TDES {
 			return output;
 		}
 
+		/** Performs the round step in the TDES pipeline. */
 		String round(String input, String key, int num) {
 			// fk
 			String left = input.substring(0, 8);
@@ -255,6 +256,7 @@ public class TDES {
 			return right + left;
 		}
 
+		/** Performs the encrypt step in the TDES pipeline. */
 		String encrypt(String plainText, String key) {
 			int i;
 			// get round keys
@@ -277,6 +279,7 @@ public class TDES {
 			return plainText;
 		}
 
+		/** Performs the decrypt step in the TDES pipeline. */
 		String decrypt(String plainText, String key) {
 			int i;
 			// get round keys
@@ -300,6 +303,7 @@ public class TDES {
 	}
 
 	private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+	/** Performs the bytesToHex step in the TDES pipeline. */
 	private static String bytesToHex(byte[] bytes) {
 		char[] hexChars = new char[bytes.length * 2];
 		for ( int j = 0; j < bytes.length; j++ ) {

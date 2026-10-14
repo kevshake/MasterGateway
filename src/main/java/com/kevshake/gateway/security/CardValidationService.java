@@ -37,15 +37,18 @@ public class CardValidationService {
         private final String displayName;
         private final String pattern;
         
+    /** Executes the CardType gateway operation. */
         CardType(String displayName, String pattern) {
             this.displayName = displayName;
             this.pattern = pattern;
         }
         
+    /** Returns the display name. */
         public String getDisplayName() {
             return displayName;
         }
         
+    /** Returns the pattern. */
         public String getPattern() {
             return pattern;
         }
@@ -61,6 +64,7 @@ public class CardValidationService {
         private final String maskedPan;
         private final String errorMessage;
         
+    /** Executes the CardValidationResult gateway operation. */
         public CardValidationResult(boolean valid, boolean luhnValid, CardType cardType, String maskedPan, String errorMessage) {
             this.valid = valid;
             this.luhnValid = luhnValid;
@@ -69,13 +73,19 @@ public class CardValidationService {
             this.errorMessage = errorMessage;
         }
         
+    /** Indicates whether valid. */
         public boolean isValid() { return valid; }
+    /** Indicates whether luhn valid. */
         public boolean isLuhnValid() { return luhnValid; }
+    /** Returns the card type. */
         public CardType getCardType() { return cardType; }
+    /** Returns the masked pan. */
         public String getMaskedPan() { return maskedPan; }
+    /** Returns the error message. */
         public String getErrorMessage() { return errorMessage; }
         
         @Override
+    /** Executes the toString gateway operation. */
         public String toString() {
             return String.format("CardValidationResult{valid=%s, luhnValid=%s, cardType=%s, maskedPan='%s', errorMessage='%s'}", 
                 valid, luhnValid, cardType.getDisplayName(), maskedPan, errorMessage);
