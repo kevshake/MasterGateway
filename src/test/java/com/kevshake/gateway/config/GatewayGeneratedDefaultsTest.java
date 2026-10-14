@@ -5,12 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.EnumSet;
 import java.util.Properties;
 import java.util.Set;
@@ -20,6 +18,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -108,8 +108,8 @@ class GatewayGeneratedDefaultsTest {
 
 	/** Ensures persisted files and directories are owner-only on POSIX filesystems. */
 	@Test
+	@DisabledOnOs(OS.WINDOWS)
 	void persistedFileAndDirectoryAreOwnerOnlyOnPosix() throws Exception {
-		assumeTrue(isPosixFilesystem(tempDir));
 		Path defaultsFile = tempDir.resolve("nested/generated-defaults.properties");
 		MockEnvironment environment = emptyEnvironment(defaultsFile);
 		new GatewayEnvironmentValidator().postProcessEnvironment(environment, new SpringApplicationBuilder().build());
@@ -203,18 +203,6 @@ class GatewayGeneratedDefaultsTest {
 				"--server.port=0",
 				"--iso8583.pos.netty-server-enabled=false"
 		};
-	}
-
-	/** Detects whether the temp directory supports POSIX permission inspection. */
-	private static boolean isPosixFilesystem(Path path) {
-		try {
-			Files.getPosixFilePermissions(path);
-			return true;
-		} catch (UnsupportedOperationException ex) {
-			return false;
-		} catch (Exception ex) {
-			return false;
-		}
 	}
 
 	/** Package-local helpers for tests that need non-sample secret shapes without pulling test support types. */

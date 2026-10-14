@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 class GatewayGeneratedDefaultsAclTest {
@@ -65,20 +66,20 @@ class GatewayGeneratedDefaultsAclTest {
 		assertTrue(failure.getMessage().contains("other principals"));
 	}
 
-	/** On ACL-only filesystems, rejects a widened on-disk ACL when loading persisted defaults. */
+	/** On Windows, rejects a widened on-disk ACL when loading persisted defaults. */
 	@Test
+	@EnabledOnOs(OS.WINDOWS)
 	void rejectsWidenedAclOnLoadWhenAclFilesystemSupported() throws Exception {
-		assumeTrue(isAclOnlyFilesystem(tempDir));
 		Path defaultsFile = tempDir.resolve("generated-defaults.properties");
 		GatewayGeneratedDefaultsFileStore.loadOrGenerateMissing(
 				defaultsFile,
 				EnumSet.of(GatewaySettingKind.ADMIN_PASSWORD));
 
 		AclFileAttributeView aclView = Files.getFileAttributeView(defaultsFile, AclFileAttributeView.class);
-		assumeTrue(aclView != null);
+		assertNotNull(aclView);
 		UserPrincipal owner = aclView.getOwner();
 		UserPrincipal other = resolveSecondaryPrincipal(defaultsFile, owner);
-		assumeTrue(other != null);
+		assertNotNull(other, "no secondary principal found");
 
 		List<AclEntry> widened = new ArrayList<>(aclView.getAcl());
 		widened.add(AclEntry.newBuilder()
@@ -93,32 +94,6 @@ class GatewayGeneratedDefaultsAclTest {
 				() -> GatewayGeneratedDefaultsFileStore.load(defaultsFile));
 		assertTrue(failure.getMessage().contains(GatewayGeneratedDefaultsFileStore.DEFAULTS_FILE_ENV));
 		assertTrue(failure.getMessage().contains(defaultsFile.getFileName().toString()));
-	}
-
-	/** True when POSIX permission APIs are unavailable but an ACL view can be opened on a new file. */
-	private static boolean isAclOnlyFilesystem(Path directory) throws IOException {
-		if (supportsPosixPermissions(directory)) {
-			return false;
-		}
-		Path probe = directory.resolve(".acl-probe");
-		Files.createFile(probe);
-		try {
-			return Files.getFileAttributeView(probe, AclFileAttributeView.class) != null;
-		} finally {
-			Files.deleteIfExists(probe);
-		}
-	}
-
-	/** Mirrors production detection of POSIX permission support for a path. */
-	private static boolean supportsPosixPermissions(Path path) {
-		try {
-			Files.getPosixFilePermissions(path);
-			return true;
-		} catch (UnsupportedOperationException ex) {
-			return false;
-		} catch (IOException ex) {
-			return false;
-		}
 	}
 
 	/** Resolves a secondary principal name commonly present on Windows ACL filesystems. */
@@ -146,8 +121,10 @@ class GatewayGeneratedDefaultsAclTest {
 				.build();
 	}
 
+	/** Minimal {@link UserPrincipal} for ACL list simulations without a live security domain. */
 	private record NamedUser(String name) implements UserPrincipal {
 
+		/** Returns the principal name used in {@link AclEntry#principal()} equality checks. */
 		@Override
 		public String getName() {
 			return name;
