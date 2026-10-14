@@ -24,7 +24,6 @@ public class GatewaySecurityConfiguration {
 	 */
 	@Bean
 	@Order(1)
-/** Supports actuatorHealthSecurityFilterChain for the gateway. */
 	SecurityFilterChain actuatorHealthSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.securityMatcher(EndpointRequest.to("health"))
 				.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
@@ -41,7 +40,6 @@ public class GatewaySecurityConfiguration {
 	@Bean
 	@Order(2)
 	@Profile("local")
-/** Supports h2ConsoleSecurityFilterChain for the gateway. */
 	SecurityFilterChain h2ConsoleSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.securityMatcher(PathPatternRequestMatcher.withDefaults().matcher("/h2-console/**"))
 				.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
@@ -56,7 +54,6 @@ public class GatewaySecurityConfiguration {
 	 */
 	@Bean
 	@Order(3)
-/** Supports denyAllCatchAllSecurityFilterChain for the gateway. */
 	SecurityFilterChain denyAllCatchAllSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.securityMatcher("/**")
 				.authorizeHttpRequests(auth -> auth.anyRequest().denyAll())

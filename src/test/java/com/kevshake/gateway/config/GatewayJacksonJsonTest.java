@@ -6,27 +6,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.core.StreamWriteFeature;
+import com.kevshake.gateway.support.AbstractGatewayIntegrationTest;
+import com.kevshake.gateway.support.GatewayIntegrationTest;
+
 import tools.jackson.databind.json.JsonMapper;
 
-class GatewayJacksonJsonTest {
+@GatewayIntegrationTest
+class GatewayJacksonJsonTest extends AbstractGatewayIntegrationTest {
 
+	@Autowired
 	private JsonMapper jsonMapper;
 
-	/** Builds a JsonMapper that mirrors {@link GatewayJacksonConfiguration} defaults. */
-	@BeforeEach
-	void setUp() {
-		jsonMapper = JsonMapper.builder()
-				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-				.enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
-				.build();
-	}
-
-	/** Serializes whole BigDecimal amounts without scientific notation. */
+	/** Serializes whole BigDecimal amounts as plain JSON numbers without scientific notation. */
 	@Test
 	void bigDecimalUsesPlainDecimalNotation() throws Exception {
 		String json = jsonMapper.writeValueAsString(new AmountHolder(new BigDecimal("3990")));
@@ -41,19 +35,22 @@ class GatewayJacksonJsonTest {
 		assertEquals("{\"day\":\"2026-10-14\"}", json);
 	}
 
-	/** Ignores unknown JSON properties during deserialization. */
+	/** Ignores unknown JSON properties during deserialization via the shared application JsonMapper. */
 	@Test
 	void unknownPropertiesAreIgnored() throws Exception {
 		SampleDto dto = jsonMapper.readValue("{\"name\":\"pos\",\"unexpected\":true}", SampleDto.class);
 		assertEquals("pos", dto.name());
 	}
 
+	/** Holds a BigDecimal field for Jackson serialization tests. */
 	private record AmountHolder(BigDecimal amount) {
 	}
 
+	/** Holds a calendar date field for Jackson Java Time tests. */
 	private record DateHolder(LocalDate day) {
 	}
 
+	/** Holds a single name field for unknown-property deserialization tests. */
 	private record SampleDto(String name) {
 	}
 }

@@ -380,13 +380,13 @@ public class ResponseCodeService {
             this.category = category;
         }
 
-        // Getters
+        /** ISO8583 response code (field 39). */
         public String getCode() { return code; }
-    /** Returns the description. */
+        /** Human-readable response text. */
         public String getDescription() { return description; }
-    /** Returns the severity. */
+        /** Operational severity for monitoring. */
         public ResponseSeverity getSeverity() { return severity; }
-    /** Returns the category. */
+        /** High-level approval/decline/error grouping. */
         public ResponseCategory getCategory() { return category; }
 
         @Override
@@ -408,7 +408,6 @@ public class ResponseCodeService {
             responseCode,
             getResponseDescription(responseCode),
             getResponseSeverity(responseCode),
-    /** Returns the response category. */
             getResponseCategory(responseCode)
         );
     }

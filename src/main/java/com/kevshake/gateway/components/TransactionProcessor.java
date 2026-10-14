@@ -466,44 +466,28 @@ public class TransactionProcessor {
         public String getStan() { return stan; }
     /** Sets the stan. */
         public void setStan(String stan) { this.stan = stan; }
-        
-    /** Returns the date. */
-        public String getDate() { return date; }
+    public String getDate() { return date; }
     /** Sets the date. */
         public void setDate(String date) { this.date = date; }
-        
-    /** Returns the time. */
-        public String getTime() { return time; }
+    public String getTime() { return time; }
     /** Sets the time. */
         public void setTime(String time) { this.time = time; }
-        
-    /** Returns the pan. */
-        public String getPan() { return pan; }
+    public String getPan() { return pan; }
     /** Sets the pan. */
         public void setPan(String pan) { this.pan = pan; }
-        
-    /** Returns the amount. */
-        public String getAmount() { return amount; }
+    public String getAmount() { return amount; }
     /** Sets the amount. */
         public void setAmount(String amount) { this.amount = amount; }
-        
-    /** Returns the processing code. */
-        public String getProcessingCode() { return processingCode; }
+    public String getProcessingCode() { return processingCode; }
     /** Sets the processing code. */
         public void setProcessingCode(String processingCode) { this.processingCode = processingCode; }
-        
-    /** Returns the response code. */
-        public String getResponseCode() { return responseCode; }
+    public String getResponseCode() { return responseCode; }
     /** Sets the response code. */
         public void setResponseCode(String responseCode) { this.responseCode = responseCode; }
-        
-    /** Returns the rrn. */
-        public String getRrn() { return rrn; }
+    public String getRrn() { return rrn; }
     /** Sets the rrn. */
         public void setRrn(String rrn) { this.rrn = rrn; }
-        
-    /** Returns the timestamp. */
-        public LocalDateTime getTimestamp() { return timestamp; }
+    public LocalDateTime getTimestamp() { return timestamp; }
     /** Sets the timestamp. */
         public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
         

@@ -398,15 +398,15 @@ public class BankResponseCodeService {
             this.recommendedAction = recommendedAction;
         }
 
-        // Getters
+        /** ISO8583 bank response code (field 39). */
         public String getCode() { return code; }
-    /** Returns the description. */
+        /** Human-readable bank response text. */
         public String getDescription() { return description; }
-    /** Returns the severity. */
+        /** Operational severity for monitoring and alerting. */
         public BankResponseSeverity getSeverity() { return severity; }
-    /** Returns the category. */
+        /** High-level grouping (approval, decline, error, etc.). */
         public BankResponseCategory getCategory() { return category; }
-    /** Returns the recommended action. */
+        /** Suggested merchant or ops follow-up for this code. */
         public String getRecommendedAction() { return recommendedAction; }
 
         @Override
@@ -429,7 +429,6 @@ public class BankResponseCodeService {
             getBankResponseDescription(responseCode),
             getBankResponseSeverity(responseCode),
             getBankResponseCategory(responseCode),
-    /** Returns the recommended action. */
             getRecommendedAction(responseCode)
         );
     }

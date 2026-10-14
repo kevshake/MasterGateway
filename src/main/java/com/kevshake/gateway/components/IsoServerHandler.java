@@ -607,7 +607,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
-    /** Returns the response mti. */
+    /** Maps inbound request MTI to the matching ISO8583 response MTI. */
     private String getResponseMti(String requestMti) {
         // Convert request MTI to response MTI
         switch (requestMti) {

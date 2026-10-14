@@ -13,7 +13,7 @@ iso8583:
     packager: org.jpos.iso.packager.ISO87APackager
     netty-server-enabled: true
   bank:
-    host: 192.168.1.100
+    host: ${ISO8583_BANK_HOST}
     port: 8001
     channel-type: ASCII
     packager: org.jpos.iso.packager.ISO87BPackager
@@ -24,8 +24,8 @@ iso8583:
       delay-ms: 5000
       backoff-multiplier: 2.0
   security:
-    gateway-zonal-key: 40763BB5B0B910B5CE3297E58967CD2A
-    default-terminal-key: 9E4F7FF1F831F1132CD9B6C740B0134C
+    gateway-zonal-key: ${GATEWAY_ZONAL_KEY}
+    default-terminal-key: ${GATEWAY_DEFAULT_TERMINAL_KEY}
     pin:
       enable-transposition: true
       validate-pin-blocks: true

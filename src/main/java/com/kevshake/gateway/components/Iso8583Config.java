@@ -54,7 +54,7 @@ public class Iso8583Config {
         this.packager = packager;
     }
     
-    /** Returns the fields. */
+    /** ISO8583 field format map (field number to encoding type) from {@code iso8583.fields}. */
     public Map<Integer, String> getFields() {
         return fields;
     }

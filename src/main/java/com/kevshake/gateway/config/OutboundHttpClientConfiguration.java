@@ -23,7 +23,6 @@ public class OutboundHttpClientConfiguration {
 	 * Builds the shared outbound HTTP client used by future bank or orchestration REST integrations.
 	 */
 	@Bean
-/** Supports gatewayHttpClient for the gateway. */
 	HttpClient gatewayHttpClient() {
 		return HttpClient.newBuilder()
 				.connectTimeout(Duration.ofMillis(connectTimeoutMs))

@@ -40,14 +40,10 @@ public class CardValidationService {
             this.displayName = displayName;
             this.pattern = pattern;
         }
-        
-    /** Returns the display name. */
-        public String getDisplayName() {
+    public String getDisplayName() {
             return displayName;
         }
-        
-    /** Returns the pattern. */
-        public String getPattern() {
+    public String getPattern() {
             return pattern;
         }
     }
@@ -73,12 +69,9 @@ public class CardValidationService {
         public boolean isValid() { return valid; }
     /** Indicates whether luhn valid. */
         public boolean isLuhnValid() { return luhnValid; }
-    /** Returns the card type. */
-        public CardType getCardType() { return cardType; }
-    /** Returns the masked pan. */
-        public String getMaskedPan() { return maskedPan; }
-    /** Returns the error message. */
-        public String getErrorMessage() { return errorMessage; }
+    public CardType getCardType() { return cardType; }
+    public String getMaskedPan() { return maskedPan; }
+    public String getErrorMessage() { return errorMessage; }
         
         @Override
         /** Implements toString for CardValidationService. */

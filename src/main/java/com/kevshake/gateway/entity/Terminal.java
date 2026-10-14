@@ -107,9 +107,7 @@ public class Terminal {
         TerminalStatus(String description) {
             this.description = description;
         }
-
-    /** Returns the description. */
-        public String getDescription() {
+    public String getDescription() {
             return description;
         }
     }
@@ -123,8 +121,6 @@ public class Terminal {
     public void setId(Long id) {
         this.id = id;
     }
-
-    /** Returns the terminal id. */
     public String getTerminalId() {
         return terminalId;
     }
@@ -133,8 +129,6 @@ public class Terminal {
     public void setTerminalId(String terminalId) {
         this.terminalId = terminalId;
     }
-
-    /** Returns the merchant id. */
     public String getMerchantId() {
         return merchantId;
     }
@@ -143,8 +137,6 @@ public class Terminal {
     public void setMerchantId(String merchantId) {
         this.merchantId = merchantId;
     }
-
-    /** Returns the terminal name. */
     public String getTerminalName() {
         return terminalName;
     }
@@ -153,8 +145,6 @@ public class Terminal {
     public void setTerminalName(String terminalName) {
         this.terminalName = terminalName;
     }
-
-    /** Returns the location. */
     public String getLocation() {
         return location;
     }
@@ -163,8 +153,6 @@ public class Terminal {
     public void setLocation(String location) {
         this.location = location;
     }
-
-    /** Returns the status. */
     public TerminalStatus getStatus() {
         return status;
     }
@@ -173,8 +161,6 @@ public class Terminal {
     public void setStatus(TerminalStatus status) {
         this.status = status;
     }
-
-    /** Returns the terminal type. */
     public String getTerminalType() {
         return terminalType;
     }
@@ -183,8 +169,6 @@ public class Terminal {
     public void setTerminalType(String terminalType) {
         this.terminalType = terminalType;
     }
-
-    /** Returns the serial number. */
     public String getSerialNumber() {
         return serialNumber;
     }
@@ -193,8 +177,6 @@ public class Terminal {
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
-
-    /** Returns the software version. */
     public String getSoftwareVersion() {
         return softwareVersion;
     }
@@ -203,8 +185,6 @@ public class Terminal {
     public void setSoftwareVersion(String softwareVersion) {
         this.softwareVersion = softwareVersion;
     }
-
-    /** Returns the created date. */
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
@@ -213,8 +193,6 @@ public class Terminal {
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
-
-    /** Returns the updated date. */
     public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
@@ -223,8 +201,6 @@ public class Terminal {
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
-
-    /** Returns the last activity date. */
     public LocalDateTime getLastActivityDate() {
         return lastActivityDate;
     }
@@ -233,8 +209,6 @@ public class Terminal {
     public void setLastActivityDate(LocalDateTime lastActivityDate) {
         this.lastActivityDate = lastActivityDate;
     }
-
-    /** Returns the key change count. */
     public Integer getKeyChangeCount() {
         return keyChangeCount;
     }
@@ -243,8 +217,6 @@ public class Terminal {
     public void setKeyChangeCount(Integer keyChangeCount) {
         this.keyChangeCount = keyChangeCount;
     }
-
-    /** Returns the last key change date. */
     public LocalDateTime getLastKeyChangeDate() {
         return lastKeyChangeDate;
     }
@@ -253,8 +225,6 @@ public class Terminal {
     public void setLastKeyChangeDate(LocalDateTime lastKeyChangeDate) {
         this.lastKeyChangeDate = lastKeyChangeDate;
     }
-
-    /** Returns the notes. */
     public String getNotes() {
         return notes;
     }
@@ -263,8 +233,6 @@ public class Terminal {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
-    /** Returns the terminal key. */
     public TerminalKey getTerminalKey() {
         return terminalKey;
     }
@@ -330,8 +298,6 @@ public class Terminal {
         }
         return terminalId;
     }
-
-    /** Returns the key info. */
     public String getKeyInfo() {
         if (terminalKey == null) {
             return "No key assigned";

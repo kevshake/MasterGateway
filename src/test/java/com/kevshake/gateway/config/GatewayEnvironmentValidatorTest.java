@@ -41,7 +41,7 @@ class GatewayEnvironmentValidatorTest {
 	@Test
 	void rejectsH2ConsoleOutsideLocalProfile() {
 		MockEnvironment env = baseEnv();
-		env.setProperty("GATEWAY_ADMIN_PASSWORD", GatewayTestCredentials.ADMIN_PASSWORD);
+		env.setProperty("GATEWAY_ADMIN_PASSWORD", GatewayTestCredentials.adminPassword());
 		env.setProperty("spring.h2.console.enabled", "true");
 		assertThrows(IllegalStateException.class, () -> validator.postProcessEnvironment(env, new SpringApplication()));
 	}
@@ -50,14 +50,18 @@ class GatewayEnvironmentValidatorTest {
 	@Test
 	void acceptsStrongPasswordOnDefaultProfile() {
 		MockEnvironment env = baseEnv();
-		env.setProperty("GATEWAY_ADMIN_PASSWORD", GatewayTestCredentials.ADMIN_PASSWORD);
+		env.setProperty("GATEWAY_ADMIN_PASSWORD", GatewayTestCredentials.adminPassword());
 		assertDoesNotThrow(() -> validator.postProcessEnvironment(env, new SpringApplication()));
 	}
 
+	/** Builds a mock environment with H2 console off and a valid datasource password but no admin password. */
 	private static MockEnvironment baseEnv() {
 		MockEnvironment env = new MockEnvironment();
-		env.setProperty("spring.datasource.password", GatewayTestCredentials.H2_DATASOURCE_PASSWORD);
+		env.setProperty("spring.datasource.password", GatewayTestCredentials.h2DatasourcePassword());
 		env.setProperty("spring.h2.console.enabled", "false");
+		env.setProperty("GATEWAY_ZONAL_KEY", GatewayTestCredentials.zonalKey());
+		env.setProperty("GATEWAY_DEFAULT_TERMINAL_KEY", GatewayTestCredentials.defaultTerminalKey());
+		env.setProperty("ISO8583_BANK_HOST", GatewayTestCredentials.bankHost());
 		return env;
 	}
 }

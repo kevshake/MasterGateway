@@ -13,11 +13,8 @@ import tools.jackson.core.StreamWriteFeature;
 @Configuration
 public class GatewayJacksonConfiguration {
 
-	/**
-	 * Disables failing on unknown JSON properties and writes BigDecimal values as plain decimal strings.
-	 */
+	/** Tolerates unknown JSON fields and emits BigDecimal values as plain JSON numbers (no scientific notation). */
 	@Bean
-/** Supports gatewayJsonMapperCustomizer for the gateway. */
 	JsonMapperBuilderCustomizer gatewayJsonMapperCustomizer() {
 		return builder -> {
 			builder.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);

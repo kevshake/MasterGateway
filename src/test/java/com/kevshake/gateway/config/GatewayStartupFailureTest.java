@@ -17,7 +17,7 @@ class GatewayStartupFailureTest {
 	@Test
 	void validatorRejectsMissingAdminPasswordOnDefaultProfile() {
 		MockEnvironment env = new MockEnvironment();
-		env.setProperty("spring.datasource.password", GatewayTestCredentials.H2_DATASOURCE_PASSWORD);
+		env.setProperty("spring.datasource.password", GatewayTestCredentials.h2DatasourcePassword());
 		try {
 			validator.postProcessEnvironment(env, new SpringApplication());
 		} catch (IllegalStateException ex) {
@@ -32,12 +32,12 @@ class GatewayStartupFailureTest {
 	void validatorRejectsKnownDefaultPasswordOnProdProfile() {
 		MockEnvironment env = new MockEnvironment();
 		env.setActiveProfiles("prod");
-		env.setProperty("spring.datasource.password", GatewayTestCredentials.H2_DATASOURCE_PASSWORD);
+		env.setProperty("spring.datasource.password", GatewayTestCredentials.h2DatasourcePassword());
 		env.setProperty("GATEWAY_ADMIN_PASSWORD", "1234567890123456");
 		try {
 			validator.postProcessEnvironment(env, new SpringApplication());
 		} catch (IllegalStateException ex) {
-			assertTrue(ex.getMessage().contains("known unsafe default"));
+			assertTrue(ex.getMessage().contains("known unsafe"));
 			return;
 		}
 		throw new AssertionError("Expected IllegalStateException for known default password");

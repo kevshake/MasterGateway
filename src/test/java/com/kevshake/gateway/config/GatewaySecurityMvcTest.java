@@ -6,14 +6,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.kevshake.gateway.support.AbstractGatewayIntegrationTest;
 import com.kevshake.gateway.support.GatewayIntegrationTest;
 
 @GatewayIntegrationTest
-@AutoConfigureMockMvc
-class GatewaySecurityMvcTest {
+class GatewaySecurityMvcTest extends AbstractGatewayIntegrationTest {
 
 	@Autowired
 	private MockMvc mockMvc;

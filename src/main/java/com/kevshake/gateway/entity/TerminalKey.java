@@ -83,9 +83,7 @@ public class TerminalKey {
         KeyStatus(String description) {
             this.description = description;
         }
-
-    /** Returns the description. */
-        public String getDescription() {
+    public String getDescription() {
             return description;
         }
     }
@@ -99,8 +97,6 @@ public class TerminalKey {
     public void setKeyId(Long keyId) {
         this.keyId = keyId;
     }
-
-    /** Returns the key value. */
     public String getKeyValue() {
         return keyValue;
     }
@@ -109,8 +105,6 @@ public class TerminalKey {
     public void setKeyValue(String keyValue) {
         this.keyValue = keyValue;
     }
-
-    /** Returns the key type. */
     public String getKeyType() {
         return keyType;
     }
@@ -119,8 +113,6 @@ public class TerminalKey {
     public void setKeyType(String keyType) {
         this.keyType = keyType;
     }
-
-    /** Returns the key status. */
     public KeyStatus getKeyStatus() {
         return keyStatus;
     }
@@ -129,8 +121,6 @@ public class TerminalKey {
     public void setKeyStatus(KeyStatus keyStatus) {
         this.keyStatus = keyStatus;
     }
-
-    /** Returns the key check value. */
     public String getKeyCheckValue() {
         return keyCheckValue;
     }
@@ -139,8 +129,6 @@ public class TerminalKey {
     public void setKeyCheckValue(String keyCheckValue) {
         this.keyCheckValue = keyCheckValue;
     }
-
-    /** Returns the key length. */
     public Integer getKeyLength() {
         return keyLength;
     }
@@ -149,8 +137,6 @@ public class TerminalKey {
     public void setKeyLength(Integer keyLength) {
         this.keyLength = keyLength;
     }
-
-    /** Returns the created date. */
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
@@ -159,8 +145,6 @@ public class TerminalKey {
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
-
-    /** Returns the updated date. */
     public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
@@ -169,8 +153,6 @@ public class TerminalKey {
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
-
-    /** Returns the expiry date. */
     public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
@@ -179,8 +161,6 @@ public class TerminalKey {
     public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
     }
-
-    /** Returns the notes. */
     public String getNotes() {
         return notes;
     }
@@ -189,8 +169,6 @@ public class TerminalKey {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
-    /** Returns the terminal. */
     public Terminal getTerminal() {
         return terminal;
     }

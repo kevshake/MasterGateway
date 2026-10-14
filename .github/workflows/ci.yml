@@ -8,11 +8,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      GATEWAY_ADMIN_PASSWORD: IntegrationTest-Admin-Pass-32chars!
-      H2_DATASOURCE_PASSWORD: IntegrationTest-H2-Pass-32chars!!
     steps:
       - uses: actions/checkout@v4
+      - name: Generate ephemeral test secrets
+        run: |
+          echo "GATEWAY_ADMIN_PASSWORD=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+          echo "H2_DATASOURCE_PASSWORD=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

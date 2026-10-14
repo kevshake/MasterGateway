@@ -247,7 +247,6 @@ public class TerminalManagementService {
      * @return Optional containing the terminal if found
      */
     @Transactional(readOnly = true)
-    /** Returns the Terminal property. */
     public Optional<Terminal> getTerminal(String terminalId) {
         return terminalRepository.findByTerminalId(terminalId);
     }
@@ -259,7 +258,6 @@ public class TerminalManagementService {
      * @return List of terminals for the merchant
      */
     @Transactional(readOnly = true)
-    /** Returns the TerminalsByMerchant property. */
     public List<Terminal> getTerminalsByMerchant(String merchantId) {
         return terminalRepository.findByMerchantId(merchantId);
     }
@@ -270,7 +268,6 @@ public class TerminalManagementService {
      * @return List of active terminals
      */
     @Transactional(readOnly = true)
-    /** Returns the ActiveTerminals property. */
     public List<Terminal> getActiveTerminals() {
         return terminalRepository.findAllActiveTerminals();
     }
@@ -281,7 +278,6 @@ public class TerminalManagementService {
      * @return List of transaction-ready terminals
      */
     @Transactional(readOnly = true)
-    /** Returns the TransactionReadyTerminals property. */
     public List<Terminal> getTransactionReadyTerminals() {
         return terminalRepository.findTransactionReadyTerminals();
     }
@@ -292,7 +288,6 @@ public class TerminalManagementService {
      * @return List of terminals needing keys
      */
     @Transactional(readOnly = true)
-    /** Returns the TerminalsWithoutKeys property. */
     public List<Terminal> getTerminalsWithoutKeys() {
         return terminalRepository.findTerminalsWithoutKeys();
     }
@@ -303,7 +298,6 @@ public class TerminalManagementService {
      * @return List of terminals with expired keys
      */
     @Transactional(readOnly = true)
-    /** Returns the TerminalsWithExpiredKeys property. */
     public List<Terminal> getTerminalsWithExpiredKeys() {
         return terminalRepository.findTerminalsWithExpiredKeys();
     }
@@ -366,8 +360,7 @@ public class TerminalManagementService {
      * 
      * @return TerminalStatistics object with counts and metrics
      */
-    @Transactional(readOnly = true)
-    /** Returns the TerminalStatistics property. */
+    @Transactional(readOnly = true)/** Exposes the terminal statistics field for JPA and API binding. */
     public TerminalStatistics getTerminalStatistics() {
         TerminalStatistics stats = new TerminalStatistics();
         
@@ -415,14 +408,10 @@ public class TerminalManagementService {
 
         // Getters
         public boolean isSuccess() { return success; }
-    /** Returns the message. */
-        public String getMessage() { return message; }
-    /** Returns the terminal. */
-        public Terminal getTerminal() { return terminal; }
-    /** Returns the terminal key. */
-        public TerminalKey getTerminalKey() { return terminalKey; }
-    /** Returns the timestamp. */
-        public LocalDateTime getTimestamp() { return timestamp; }
+    public String getMessage() { return message; }
+    public Terminal getTerminal() { return terminal; }
+    public TerminalKey getTerminalKey() { return terminalKey; }
+    public LocalDateTime getTimestamp() { return timestamp; }
 
         @Override
         /** Implements toString for TerminalManagementService. */
@@ -458,49 +447,31 @@ public class TerminalManagementService {
         public long getTotalTerminals() { return totalTerminals; }
     /** Sets the total terminals. */
         public void setTotalTerminals(long totalTerminals) { this.totalTerminals = totalTerminals; }
-
-    /** Returns the active terminals. */
-        public long getActiveTerminals() { return activeTerminals; }
+    public long getActiveTerminals() { return activeTerminals; }
     /** Sets the active terminals. */
         public void setActiveTerminals(long activeTerminals) { this.activeTerminals = activeTerminals; }
-
-    /** Returns the inactive terminals. */
-        public long getInactiveTerminals() { return inactiveTerminals; }
+    public long getInactiveTerminals() { return inactiveTerminals; }
     /** Sets the inactive terminals. */
         public void setInactiveTerminals(long inactiveTerminals) { this.inactiveTerminals = inactiveTerminals; }
-
-    /** Returns the suspended terminals. */
-        public long getSuspendedTerminals() { return suspendedTerminals; }
+    public long getSuspendedTerminals() { return suspendedTerminals; }
     /** Sets the suspended terminals. */
         public void setSuspendedTerminals(long suspendedTerminals) { this.suspendedTerminals = suspendedTerminals; }
-
-    /** Returns the terminals with keys. */
-        public long getTerminalsWithKeys() { return terminalsWithKeys; }
+    public long getTerminalsWithKeys() { return terminalsWithKeys; }
     /** Sets the terminals with keys. */
         public void setTerminalsWithKeys(long terminalsWithKeys) { this.terminalsWithKeys = terminalsWithKeys; }
-
-    /** Returns the terminals without keys. */
-        public long getTerminalsWithoutKeys() { return terminalsWithoutKeys; }
+    public long getTerminalsWithoutKeys() { return terminalsWithoutKeys; }
     /** Sets the terminals without keys. */
         public void setTerminalsWithoutKeys(long terminalsWithoutKeys) { this.terminalsWithoutKeys = terminalsWithoutKeys; }
-
-    /** Returns the terminals with expired keys. */
-        public long getTerminalsWithExpiredKeys() { return terminalsWithExpiredKeys; }
+    public long getTerminalsWithExpiredKeys() { return terminalsWithExpiredKeys; }
     /** Sets the terminals with expired keys. */
         public void setTerminalsWithExpiredKeys(long terminalsWithExpiredKeys) { this.terminalsWithExpiredKeys = terminalsWithExpiredKeys; }
-
-    /** Returns the total keys. */
-        public long getTotalKeys() { return totalKeys; }
+    public long getTotalKeys() { return totalKeys; }
     /** Sets the total keys. */
         public void setTotalKeys(long totalKeys) { this.totalKeys = totalKeys; }
-
-    /** Returns the active keys. */
-        public long getActiveKeys() { return activeKeys; }
+    public long getActiveKeys() { return activeKeys; }
     /** Sets the active keys. */
         public void setActiveKeys(long activeKeys) { this.activeKeys = activeKeys; }
-
-    /** Returns the expired keys. */
-        public long getExpiredKeys() { return expiredKeys; }
+    public long getExpiredKeys() { return expiredKeys; }
     /** Sets the expired keys. */
         public void setExpiredKeys(long expiredKeys) { this.expiredKeys = expiredKeys; }
 
