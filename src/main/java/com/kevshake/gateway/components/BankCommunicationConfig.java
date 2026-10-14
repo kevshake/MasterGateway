@@ -19,6 +19,7 @@ public class BankCommunicationConfig {
         private int port = 5878;
         private String channelType = "NACC";
         private String packager = "org.jpos.iso.packager.ISO87APackager";
+        private boolean nettyServerEnabled = true;
         
         // Getters and setters
         public int getPort() { return port; }
@@ -34,6 +35,12 @@ public class BankCommunicationConfig {
         public String getPackager() { return packager; }
     /** Sets the packager. */
         public void setPackager(String packager) { this.packager = packager; }
+
+        /** Returns whether the embedded Netty POS ISO8583 server should start. */
+        public boolean isNettyServerEnabled() { return nettyServerEnabled; }
+
+        /** Sets whether the embedded Netty POS ISO8583 server should start. */
+        public void setNettyServerEnabled(boolean nettyServerEnabled) { this.nettyServerEnabled = nettyServerEnabled; }
     }
     
     public static class Bank {

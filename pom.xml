@@ -22,6 +22,8 @@
 		<tomcat.version>11.0.27</tomcat.version>
 		<bouncycastle.version>2.73.13</bouncycastle.version>
 		<jline.version>4.4.8</jline.version>
+		<netty.version>4.2.19.Final</netty.version>
+		<sshd.version>2.20.0</sshd.version>
 	</properties>
 
 	<dependencyManagement>
@@ -46,6 +48,16 @@
 				<artifactId>jline</artifactId>
 				<version>${jline.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.sshd</groupId>
+				<artifactId>sshd-core</artifactId>
+				<version>${sshd.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.sshd</groupId>
+				<artifactId>sshd-common</artifactId>
+				<version>${sshd.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -58,16 +70,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
@@ -129,6 +131,10 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-handler</artifactId>
+		</dependency>
 	    <dependency>
 	        <groupId>org.jpos</groupId>
 	        <artifactId>jpos</artifactId>
@@ -174,6 +180,16 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jackson-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -190,6 +206,7 @@
 					<failBuildOnCVSS>7</failBuildOnCVSS>
 					<nvdValidForHours>168</nvdValidForHours>
 					<ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
+					<assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
 					<suppressionFiles>
 						<suppressionFile>${project.basedir}/dependency-check-suppressions.xml</suppressionFile>
 					</suppressionFiles>

@@ -1,17 +1,14 @@
 package com.kevshake.gateway.config;
 
-import io.netty.channel.ChannelOption;
+import java.net.http.HttpClient;
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
-
-import java.time.Duration;
 
 /**
- * Supplies a WebClient with explicit connect and read timeouts for any outbound HTTP calls.
+ * Supplies a JDK {@link HttpClient} with explicit connect and read timeouts for outbound HTTP calls.
  */
 @Configuration
 public class OutboundHttpClientConfiguration {
@@ -23,15 +20,13 @@ public class OutboundHttpClientConfiguration {
 	private int readTimeoutMs;
 
 	/**
-	 * Builds the application WebClient using Reactor Netty with configured connect and response timeouts.
+	 * Builds the shared outbound HTTP client used by future bank or orchestration REST integrations.
 	 */
 	@Bean
-	WebClient gatewayWebClient() {
-		HttpClient httpClient = HttpClient.create()
-				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMs)
-				.responseTimeout(Duration.ofMillis(readTimeoutMs));
-		return WebClient.builder()
-				.clientConnector(new ReactorClientHttpConnector(httpClient))
+/** Supports gatewayHttpClient for the gateway. */
+	HttpClient gatewayHttpClient() {
+		return HttpClient.newBuilder()
+				.connectTimeout(Duration.ofMillis(connectTimeoutMs))
 				.build();
 	}
 }

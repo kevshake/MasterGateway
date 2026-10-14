@@ -3,6 +3,7 @@ package com.kevshake.gateway.config;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +24,7 @@ public class GatewaySecurityConfiguration {
 	 */
 	@Bean
 	@Order(1)
+/** Supports actuatorHealthSecurityFilterChain for the gateway. */
 	SecurityFilterChain actuatorHealthSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.securityMatcher(EndpointRequest.to("health"))
 				.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
@@ -34,10 +36,12 @@ public class GatewaySecurityConfiguration {
 	}
 
 	/**
-	 * Protects the H2 console with HTTP basic authentication instead of leaving it anonymously reachable.
+	 * Protects the H2 console with HTTP Basic authentication when the local profile is active.
 	 */
 	@Bean
 	@Order(2)
+	@Profile("local")
+/** Supports h2ConsoleSecurityFilterChain for the gateway. */
 	SecurityFilterChain h2ConsoleSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.securityMatcher(PathPatternRequestMatcher.withDefaults().matcher("/h2-console/**"))
 				.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
@@ -52,6 +56,7 @@ public class GatewaySecurityConfiguration {
 	 */
 	@Bean
 	@Order(3)
+/** Supports denyAllCatchAllSecurityFilterChain for the gateway. */
 	SecurityFilterChain denyAllCatchAllSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.securityMatcher("/**")
 				.authorizeHttpRequests(auth -> auth.anyRequest().denyAll())

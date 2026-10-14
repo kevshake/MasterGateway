@@ -373,8 +373,6 @@ public class ResponseCodeService {
         private final String description;
         private final ResponseSeverity severity;
         private final ResponseCategory category;
-
-    /** Executes the ResponseCodeInfo gateway operation. */
         public ResponseCodeInfo(String code, String description, ResponseSeverity severity, ResponseCategory category) {
             this.code = code;
             this.description = description;
@@ -392,7 +390,7 @@ public class ResponseCodeService {
         public ResponseCategory getCategory() { return category; }
 
         @Override
-    /** Executes the toString gateway operation. */
+        /** Implements toString for ResponseCodeService. */
         public String toString() {
             return String.format("ResponseCode{code='%s', description='%s', severity=%s, category=%s}", 
                                code, description, severity, category);

@@ -36,8 +36,6 @@ public class CardValidationService {
         
         private final String displayName;
         private final String pattern;
-        
-    /** Executes the CardType gateway operation. */
         CardType(String displayName, String pattern) {
             this.displayName = displayName;
             this.pattern = pattern;
@@ -63,8 +61,6 @@ public class CardValidationService {
         private final CardType cardType;
         private final String maskedPan;
         private final String errorMessage;
-        
-    /** Executes the CardValidationResult gateway operation. */
         public CardValidationResult(boolean valid, boolean luhnValid, CardType cardType, String maskedPan, String errorMessage) {
             this.valid = valid;
             this.luhnValid = luhnValid;
@@ -85,7 +81,7 @@ public class CardValidationService {
         public String getErrorMessage() { return errorMessage; }
         
         @Override
-    /** Executes the toString gateway operation. */
+        /** Implements toString for CardValidationService. */
         public String toString() {
             return String.format("CardValidationResult{valid=%s, luhnValid=%s, cardType=%s, maskedPan='%s', errorMessage='%s'}", 
                 valid, luhnValid, cardType.getDisplayName(), maskedPan, errorMessage);

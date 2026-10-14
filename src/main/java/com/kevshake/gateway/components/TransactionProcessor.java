@@ -102,8 +102,7 @@ public class TransactionProcessor {
             return ResponseCodes.SYSTEM_ERROR;
         }
     }
-    
-    /** Executes the processTransactionByType gateway operation. */
+    /** Implements processTransactionByType for TransactionProcessor. */
     private String processTransactionByType(String processingCode, String pan, String amount, ISOMsg msg) {
         switch (processingCode) {
             case ProcessingCodes.PURCHASE:
@@ -129,8 +128,7 @@ public class TransactionProcessor {
                 return ResponseCodes.INVALID_TRANSACTION;
         }
     }
-    
-    /** Executes the processPurchaseTransaction gateway operation. */
+    /** Implements processPurchaseTransaction for TransactionProcessor. */
     private String processPurchaseTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing purchase transaction");
         
@@ -168,8 +166,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
-    /** Executes the processCashAdvanceTransaction gateway operation. */
+    /** Implements processCashAdvanceTransaction for TransactionProcessor. */
     private String processCashAdvanceTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing cash advance transaction");
         
@@ -194,8 +191,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
-    /** Executes the processRefundTransaction gateway operation. */
+    /** Implements processRefundTransaction for TransactionProcessor. */
     private String processRefundTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing refund transaction");
         
@@ -212,8 +208,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
-    /** Executes the processBalanceInquiryTransaction gateway operation. */
+    /** Implements processBalanceInquiryTransaction for TransactionProcessor. */
     private String processBalanceInquiryTransaction(String pan, ISOMsg msg) {
         log.info("Processing balance inquiry transaction");
         
@@ -224,8 +219,7 @@ public class TransactionProcessor {
         // Balance inquiry is usually approved if card is valid
         return ResponseCodes.APPROVED;
     }
-    
-    /** Executes the processPaymentTransaction gateway operation. */
+    /** Implements processPaymentTransaction for TransactionProcessor. */
     private String processPaymentTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing payment transaction");
         
@@ -245,8 +239,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
-    /** Executes the processTransferTransaction gateway operation. */
+    /** Implements processTransferTransaction for TransactionProcessor. */
     private String processTransferTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing transfer transaction");
         
@@ -303,8 +296,7 @@ public class TransactionProcessor {
             return ResponseCodes.SYSTEM_ERROR;
         }
     }
-    
-    /** Executes the processSignOn gateway operation. */
+    /** Implements processSignOn for TransactionProcessor. */
     private String processSignOn(ISOMsg msg) {
         log.info("Processing sign-on request");
         
@@ -316,8 +308,7 @@ public class TransactionProcessor {
         // In real implementation, validate terminal and merchant
         return ResponseCodes.APPROVED;
     }
-    
-    /** Executes the processSignOff gateway operation. */
+    /** Implements processSignOff for TransactionProcessor. */
     private String processSignOff(ISOMsg msg) {
         log.info("Processing sign-off request");
         
@@ -326,8 +317,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
-    /** Executes the processEchoTest gateway operation. */
+    /** Implements processEchoTest for TransactionProcessor. */
     private String processEchoTest(ISOMsg msg) {
         log.info("Processing echo test");
         return ResponseCodes.APPROVED;
@@ -374,15 +364,13 @@ public class TransactionProcessor {
         // Simple Luhn algorithm check (for demo purposes)
         return pan.startsWith("4") || pan.startsWith("5") || pan.startsWith("6"); // Visa, MC, Discover
     }
-    
-    /** Executes the hasSufficientBalance gateway operation. */
+    /** Implements hasSufficientBalance for TransactionProcessor. */
     private boolean hasSufficientBalance(String pan, long amount) {
         // Sample balance check logic
         // In real implementation, check against account balance
         return amount <= 200000; // Sample limit of $2000
     }
-    
-    /** Executes the hasCashAdvanceLimit gateway operation. */
+    /** Implements hasCashAdvanceLimit for TransactionProcessor. */
     private boolean hasCashAdvanceLimit(String pan, long amount) {
         // Sample cash advance limit check
         return amount <= 50000; // Sample limit of $500
@@ -408,14 +396,12 @@ public class TransactionProcessor {
         String key = stan + "_" + date;
         return transactionDatabase.containsKey(key);
     }
-    
-    /** Executes the hasOriginalTransaction gateway operation. */
+    /** Implements hasOriginalTransaction for TransactionProcessor. */
     private boolean hasOriginalTransaction(String rrn) {
         return transactionDatabase.values().stream()
                 .anyMatch(t -> rrn.equals(t.getRrn()));
     }
-    
-    /** Executes the storeTransaction gateway operation. */
+    /** Implements storeTransaction for TransactionProcessor. */
     private void storeTransaction(ISOMsg msg, String responseCode) {
         try {
             String key = msg.getString(11) + "_" + msg.getString(13);
@@ -437,14 +423,12 @@ public class TransactionProcessor {
             log.error("Error storing transaction", e);
         }
     }
-    
-    /** Executes the findOriginalTransaction gateway operation. */
+    /** Implements findOriginalTransaction for TransactionProcessor. */
     private TransactionRecord findOriginalTransaction(String stan, String date) {
         String key = stan + "_" + date;
         return transactionDatabase.get(key);
     }
-    
-    /** Executes the reverseTransaction gateway operation. */
+    /** Implements reverseTransaction for TransactionProcessor. */
     private boolean reverseTransaction(TransactionRecord original) {
         // Sample reversal logic
         log.info("Reversing transaction: STAN={}, Amount={}", 
@@ -455,14 +439,12 @@ public class TransactionProcessor {
         
         return true;
     }
-    
-    /** Executes the maskPan gateway operation. */
+    /** Implements maskPan for TransactionProcessor. */
     private String maskPan(String pan) {
         if (pan == null || pan.length() < 8) return "****";
         return pan.substring(0, 4) + "****" + pan.substring(pan.length() - 4);
     }
-    
-    /** Executes the generateRRN gateway operation. */
+    /** Implements generateRRN for TransactionProcessor. */
     private String generateRRN() {
         return String.format("%012d", System.currentTimeMillis() % 1000000000000L);
     }

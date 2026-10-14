@@ -64,8 +64,6 @@ public class TerminalKey {
 
     // Constructors
     public TerminalKey() {}
-
-    /** Executes the TerminalKey gateway operation. */
     public TerminalKey(String keyValue, String keyType, Integer keyLength) {
         this.keyValue = keyValue;
         this.keyType = keyType;
@@ -82,8 +80,6 @@ public class TerminalKey {
         PENDING("Pending - Awaiting activation");
 
         private final String description;
-
-    /** Executes the KeyStatus gateway operation. */
         KeyStatus(String description) {
             this.description = description;
         }
@@ -214,23 +210,19 @@ public class TerminalKey {
         return keyStatus == KeyStatus.EXPIRED || 
                (expiryDate != null && expiryDate.isBefore(LocalDateTime.now()));
     }
-
-    /** Executes the activate gateway operation. */
+    /** Implements activate for TerminalKey. */
     public void activate() {
         this.keyStatus = KeyStatus.ACTIVE;
     }
-
-    /** Executes the deactivate gateway operation. */
+    /** Implements deactivate for TerminalKey. */
     public void deactivate() {
         this.keyStatus = KeyStatus.INACTIVE;
     }
-
-    /** Executes the expire gateway operation. */
+    /** Implements expire for TerminalKey. */
     public void expire() {
         this.keyStatus = KeyStatus.EXPIRED;
     }
-
-    /** Executes the markCompromised gateway operation. */
+    /** Implements markCompromised for TerminalKey. */
     public void markCompromised() {
         this.keyStatus = KeyStatus.COMPROMISED;
     }
@@ -244,7 +236,7 @@ public class TerminalKey {
     }
 
     @Override
-    /** Executes the equals gateway operation. */
+    /** Implements equals for TerminalKey. */
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -253,13 +245,13 @@ public class TerminalKey {
     }
 
     @Override
-    /** Executes the hashCode gateway operation. */
+    /** Implements hashCode for TerminalKey. */
     public int hashCode() {
         return Objects.hash(keyId);
     }
 
     @Override
-    /** Executes the toString gateway operation. */
+    /** Implements toString for TerminalKey. */
     public String toString() {
         return "TerminalKey{" +
                 "keyId=" + keyId +

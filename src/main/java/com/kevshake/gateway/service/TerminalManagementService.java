@@ -247,6 +247,7 @@ public class TerminalManagementService {
      * @return Optional containing the terminal if found
      */
     @Transactional(readOnly = true)
+    /** Returns the Terminal property. */
     public Optional<Terminal> getTerminal(String terminalId) {
         return terminalRepository.findByTerminalId(terminalId);
     }
@@ -258,6 +259,7 @@ public class TerminalManagementService {
      * @return List of terminals for the merchant
      */
     @Transactional(readOnly = true)
+    /** Returns the TerminalsByMerchant property. */
     public List<Terminal> getTerminalsByMerchant(String merchantId) {
         return terminalRepository.findByMerchantId(merchantId);
     }
@@ -268,6 +270,7 @@ public class TerminalManagementService {
      * @return List of active terminals
      */
     @Transactional(readOnly = true)
+    /** Returns the ActiveTerminals property. */
     public List<Terminal> getActiveTerminals() {
         return terminalRepository.findAllActiveTerminals();
     }
@@ -278,6 +281,7 @@ public class TerminalManagementService {
      * @return List of transaction-ready terminals
      */
     @Transactional(readOnly = true)
+    /** Returns the TransactionReadyTerminals property. */
     public List<Terminal> getTransactionReadyTerminals() {
         return terminalRepository.findTransactionReadyTerminals();
     }
@@ -288,6 +292,7 @@ public class TerminalManagementService {
      * @return List of terminals needing keys
      */
     @Transactional(readOnly = true)
+    /** Returns the TerminalsWithoutKeys property. */
     public List<Terminal> getTerminalsWithoutKeys() {
         return terminalRepository.findTerminalsWithoutKeys();
     }
@@ -298,6 +303,7 @@ public class TerminalManagementService {
      * @return List of terminals with expired keys
      */
     @Transactional(readOnly = true)
+    /** Returns the TerminalsWithExpiredKeys property. */
     public List<Terminal> getTerminalsWithExpiredKeys() {
         return terminalRepository.findTerminalsWithExpiredKeys();
     }
@@ -361,6 +367,7 @@ public class TerminalManagementService {
      * @return TerminalStatistics object with counts and metrics
      */
     @Transactional(readOnly = true)
+    /** Returns the TerminalStatistics property. */
     public TerminalStatistics getTerminalStatistics() {
         TerminalStatistics stats = new TerminalStatistics();
         
@@ -389,23 +396,19 @@ public class TerminalManagementService {
         private Terminal terminal;
         private TerminalKey terminalKey;
         private LocalDateTime timestamp;
-
-    /** Executes the KeyChangeResult gateway operation. */
         private KeyChangeResult(boolean success, String message) {
             this.success = success;
             this.message = message;
             this.timestamp = LocalDateTime.now();
         }
-
-    /** Executes the success gateway operation. */
+        /** Implements success for TerminalManagementService. */
         public static KeyChangeResult success(Terminal terminal, TerminalKey key) {
             KeyChangeResult result = new KeyChangeResult(true, "Key change completed successfully");
             result.terminal = terminal;
             result.terminalKey = key;
             return result;
         }
-
-    /** Executes the failure gateway operation. */
+        /** Implements failure for TerminalManagementService. */
         public static KeyChangeResult failure(String message) {
             return new KeyChangeResult(false, message);
         }
@@ -422,7 +425,7 @@ public class TerminalManagementService {
         public LocalDateTime getTimestamp() { return timestamp; }
 
         @Override
-    /** Executes the toString gateway operation. */
+        /** Implements toString for TerminalManagementService. */
         public String toString() {
             return "KeyChangeResult{" +
                     "success=" + success +
@@ -502,7 +505,7 @@ public class TerminalManagementService {
         public void setExpiredKeys(long expiredKeys) { this.expiredKeys = expiredKeys; }
 
         @Override
-    /** Executes the toString gateway operation. */
+        /** Implements toString for TerminalManagementService. */
         public String toString() {
             return "TerminalStatistics{" +
                     "totalTerminals=" + totalTerminals +

@@ -12,13 +12,14 @@ public class IsoMessageDecoder extends ByteToMessageDecoder {
     @SuppressWarnings("unused")
 	private final ISOPackager packager;
 
-    /** Executes the IsoMessageDecoder gateway operation. */
+    /** Binds the POS ISO packager used to parse inbound byte frames. */
     public IsoMessageDecoder(ISOPackager packager) {
         this.packager = packager;
     }
 
+    /** Decodes inbound bytes into a jPOS {@link ISOMsg} using the POS packager. */
     @Override
-    /** Executes the decode gateway operation. */
+    /** Implements decode for IsoMessageDecoder. */
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (in.readableBytes() < 2) {
             return;
@@ -29,6 +30,7 @@ public class IsoMessageDecoder extends ByteToMessageDecoder {
         
         try {
             ISOMsg msg = new ISOMsg();
+            msg.setPackager(packager);
             msg.unpack(buffer);
             out.add(msg);
         } catch (Exception e) {

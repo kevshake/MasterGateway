@@ -410,7 +410,7 @@ public class BankResponseCodeService {
         public String getRecommendedAction() { return recommendedAction; }
 
         @Override
-    /** Executes the toString gateway operation. */
+        /** Implements toString for BankResponseCodeService. */
         public String toString() {
             return String.format("BankResponseCode{code='%s', description='%s', severity=%s, category=%s, action='%s'}", 
                                code, description, severity, category, recommendedAction);

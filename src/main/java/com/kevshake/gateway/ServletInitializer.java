@@ -7,6 +7,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 	/** Wires the ISO8583 gateway application when deployed as a WAR on an external servlet container. */
 	@Override
+	/** Implements configure for ServletInitializer. */
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(Iso8583MasterServerBase1Application.class);
 	}

@@ -139,8 +139,6 @@ public class BankPackager extends ISOBasePackager {
         /*127*/ new IFA_LLLCHAR(999, "Reserved for private use"),
         /*128*/ new IFB_BINARY(16, "Message authentication code field")
     };
-    
-    /** Executes the BankPackager gateway operation. */
     public BankPackager() {
         super();
         setFieldPackager(fld);

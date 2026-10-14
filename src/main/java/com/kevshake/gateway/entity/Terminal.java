@@ -85,15 +85,11 @@ public class Terminal {
 
     // Constructors
     public Terminal() {}
-
-    /** Executes the Terminal gateway operation. */
     public Terminal(String terminalId) {
         this.terminalId = terminalId;
         this.status = TerminalStatus.ACTIVE;
         this.keyChangeCount = 0;
     }
-
-    /** Executes the Terminal gateway operation. */
     public Terminal(String terminalId, String merchantId) {
         this(terminalId);
         this.merchantId = merchantId;
@@ -108,8 +104,6 @@ public class Terminal {
         DECOMMISSIONED("Decommissioned - Permanently disabled");
 
         private final String description;
-
-    /** Executes the TerminalStatus gateway operation. */
         TerminalStatus(String description) {
             this.description = description;
         }
@@ -287,39 +281,32 @@ public class Terminal {
     public boolean isActive() {
         return status == TerminalStatus.ACTIVE;
     }
-
-    /** Executes the canProcessTransactions gateway operation. */
+    /** Implements canProcessTransactions for Terminal. */
     public boolean canProcessTransactions() {
         return status == TerminalStatus.ACTIVE && hasValidKey();
     }
-
-    /** Executes the hasValidKey gateway operation. */
+    /** Implements hasValidKey for Terminal. */
     public boolean hasValidKey() {
         return terminalKey != null && terminalKey.isActive() && !terminalKey.isExpired();
     }
-
-    /** Executes the updateLastActivity gateway operation. */
+    /** Implements updateLastActivity for Terminal. */
     public void updateLastActivity() {
         this.lastActivityDate = LocalDateTime.now();
     }
-
-    /** Executes the incrementKeyChangeCount gateway operation. */
+    /** Implements incrementKeyChangeCount for Terminal. */
     public void incrementKeyChangeCount() {
         this.keyChangeCount = (this.keyChangeCount == null) ? 1 : this.keyChangeCount + 1;
         this.lastKeyChangeDate = LocalDateTime.now();
     }
-
-    /** Executes the activate gateway operation. */
+    /** Implements activate for Terminal. */
     public void activate() {
         this.status = TerminalStatus.ACTIVE;
     }
-
-    /** Executes the deactivate gateway operation. */
+    /** Implements deactivate for Terminal. */
     public void deactivate() {
         this.status = TerminalStatus.INACTIVE;
     }
-
-    /** Executes the suspend gateway operation. */
+    /** Implements suspend for Terminal. */
     public void suspend() {
         this.status = TerminalStatus.SUSPENDED;
     }
@@ -328,8 +315,7 @@ public class Terminal {
     public void setMaintenance() {
         this.status = TerminalStatus.MAINTENANCE;
     }
-
-    /** Executes the decommission gateway operation. */
+    /** Implements decommission for Terminal. */
     public void decommission() {
         this.status = TerminalStatus.DECOMMISSIONED;
         if (terminalKey != null) {
@@ -356,7 +342,7 @@ public class Terminal {
     }
 
     @Override
-    /** Executes the equals gateway operation. */
+    /** Implements equals for Terminal. */
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -365,13 +351,13 @@ public class Terminal {
     }
 
     @Override
-    /** Executes the hashCode gateway operation. */
+    /** Implements hashCode for Terminal. */
     public int hashCode() {
         return Objects.hash(terminalId);
     }
 
     @Override
-    /** Executes the toString gateway operation. */
+    /** Implements toString for Terminal. */
     public String toString() {
         return "Terminal{" +
                 "id=" + id +
