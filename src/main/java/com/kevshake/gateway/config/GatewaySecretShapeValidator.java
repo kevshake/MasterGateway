@@ -42,6 +42,7 @@ final class GatewaySecretShapeValidator {
 		}
 	}
 
+	/** Builds a load failure that names the file setting and property key only, never the secret value. */
 	private static IllegalStateException invalidEntry(String entryKey, String problem) {
 		return new IllegalStateException("[" + GatewayGeneratedDefaultsFileStore.DEFAULTS_FILE_ENV + "] Invalid entry key "
 				+ entryKey + ": " + problem);

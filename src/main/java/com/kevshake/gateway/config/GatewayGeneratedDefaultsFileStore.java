@@ -12,12 +12,12 @@ import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclEntryFlag;
 import java.nio.file.attribute.AclEntryPermission;
 import java.nio.file.attribute.AclEntryType;
+import java.nio.file.attribute.AclFileAttributeView;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.nio.file.attribute.UserPrincipal;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -65,7 +65,12 @@ final class GatewayGeneratedDefaultsFileStore {
 			return Map.of();
 		}
 		assertOwnedByCurrentUser(file);
-		assertOwnerOnlyReadable(file);
+		assertOwnerOnlyAccess(file);
+		Path parent = file.getParent();
+		if (parent != null) {
+			assertOwnedByCurrentUser(parent);
+			assertOwnerOnlyAccess(parent);
+		}
 		Properties properties = new Properties();
 		try (InputStream input = Files.newInputStream(file)) {
 			properties.load(input);
@@ -194,21 +199,21 @@ final class GatewayGeneratedDefaultsFileStore {
 		}
 	}
 
-	/** Applies owner-only permissions to a regular file (0600 on POSIX). */
+	/** Applies owner-only permissions to a regular file (0600 on POSIX, owner-only ACL on Windows). */
 	private static void applyOwnerOnlyFilePermissions(Path file) throws IOException {
 		try {
 			Files.setPosixFilePermissions(file, FILE_OWNER_READ_WRITE);
 		} catch (UnsupportedOperationException ex) {
-			applyOwnerOnlyAcl(file);
+			applyOwnerOnlyAcl(file, false);
 		}
 	}
 
-	/** Applies owner-only permissions to a directory (0700 on POSIX). */
+	/** Applies owner-only permissions to a directory (0700 on POSIX, owner-only ACL on Windows). */
 	private static void applyOwnerOnlyDirectoryPermissions(Path directory) throws IOException {
 		try {
 			Files.setPosixFilePermissions(directory, DIRECTORY_OWNER_ONLY);
 		} catch (UnsupportedOperationException ex) {
-			applyOwnerOnlyAcl(directory);
+			applyOwnerOnlyAcl(directory, true);
 		}
 	}
 
@@ -236,62 +241,85 @@ final class GatewayGeneratedDefaultsFileStore {
 		}
 	}
 
-	/** Verifies no group/other read bits are set on POSIX filesystems. */
-	private static void assertOwnerOnlyReadable(Path file) throws IOException {
+	/** Verifies owner-only access using POSIX bits or an ACL with no non-owner ALLOW entries. */
+	private static void assertOwnerOnlyAccess(Path path) throws IOException {
+		if (supportsPosixPermissions(path)) {
+			assertPosixOwnerOnly(path);
+			return;
+		}
+		AclFileAttributeView aclView = Files.getFileAttributeView(path, AclFileAttributeView.class);
+		if (aclView == null) {
+			throw unableToVerifyOwnerOnly(path);
+		}
+		assertOwnerOnlyAcl(aclView.getAcl(), aclView.getOwner(), path.getFileName());
+	}
+
+	/** Verifies a directory is not accessible to group/other on POSIX or via widened ACL entries. */
+	private static void verifyOwnerOnlyDirectoryPermissions(Path directory) throws IOException {
+		assertOwnerOnlyAccess(directory);
+	}
+
+	/** Returns true when POSIX permission APIs are supported for this path. */
+	private static boolean supportsPosixPermissions(Path path) {
 		try {
-			Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(file);
-			if (permissions.contains(PosixFilePermission.GROUP_READ)
-					|| permissions.contains(PosixFilePermission.OTHERS_READ)
-					|| permissions.contains(PosixFilePermission.GROUP_WRITE)
-					|| permissions.contains(PosixFilePermission.OTHERS_WRITE)) {
-				throw new IllegalStateException("[" + DEFAULTS_FILE_ENV + "] File must not be readable by group or others: "
-						+ file.getFileName());
-			}
+			Files.getPosixFilePermissions(path);
+			return true;
 		} catch (UnsupportedOperationException ex) {
-			// ACL platforms validated on write; load assumes prior secure creation.
+			return false;
+		} catch (IOException ex) {
+			return false;
 		}
 	}
 
-	/** Verifies a directory is not accessible to group/other on POSIX filesystems. */
-	private static void verifyOwnerOnlyDirectoryPermissions(Path directory) throws IOException {
-		try {
-			Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(directory);
-			if (permissions.contains(PosixFilePermission.GROUP_READ)
-					|| permissions.contains(PosixFilePermission.OTHERS_READ)
-					|| permissions.contains(PosixFilePermission.GROUP_EXECUTE)
-					|| permissions.contains(PosixFilePermission.OTHERS_EXECUTE)
-					|| permissions.contains(PosixFilePermission.GROUP_WRITE)
-					|| permissions.contains(PosixFilePermission.OTHERS_WRITE)) {
-				throw new IllegalStateException("[" + DEFAULTS_FILE_ENV + "] Directory must be owner-only: "
-						+ directory.getFileName());
-			}
-		} catch (UnsupportedOperationException ex) {
-			// See assertOwnerOnlyReadable.
+	/** Verifies no group/other permission bits are set on POSIX filesystems. */
+	private static void assertPosixOwnerOnly(Path path) throws IOException {
+		Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(path);
+		boolean directory = Files.isDirectory(path);
+		if (permissions.contains(PosixFilePermission.GROUP_READ)
+				|| permissions.contains(PosixFilePermission.OTHERS_READ)
+				|| permissions.contains(PosixFilePermission.GROUP_WRITE)
+				|| permissions.contains(PosixFilePermission.OTHERS_WRITE)
+				|| (directory && (permissions.contains(PosixFilePermission.GROUP_EXECUTE)
+						|| permissions.contains(PosixFilePermission.OTHERS_EXECUTE)))) {
+			throw new IllegalStateException("[" + DEFAULTS_FILE_ENV + "] Path must be owner-only: " + path.getFileName());
 		}
+	}
+
+	/** Rejects ACLs that grant ALLOW to any principal other than the file owner (Windows and ACL-only stores). */
+	static void assertOwnerOnlyAcl(List<AclEntry> acl, UserPrincipal owner, java.nio.file.Path fileName) {
+		for (AclEntry entry : acl) {
+			if (entry.type() != AclEntryType.ALLOW) {
+				continue;
+			}
+			if (!entry.principal().equals(owner)) {
+				throw new IllegalStateException("[" + DEFAULTS_FILE_ENV
+						+ "] Path must not grant access to other principals: "
+						+ fileName);
+			}
+		}
+	}
+
+	/** Builds a startup failure when owner-only permissions cannot be verified on load or write. */
+	private static IllegalStateException unableToVerifyOwnerOnly(Path path) {
+		return new IllegalStateException("[" + DEFAULTS_FILE_ENV
+				+ "] Unable to verify owner-only permissions for "
+				+ path.getFileName());
 	}
 
 	/** Applies an owner-only ACL when POSIX permissions are unavailable. */
-	private static void applyOwnerOnlyAcl(Path path) throws IOException {
-		var aclView = Files.getFileAttributeView(path, java.nio.file.attribute.AclFileAttributeView.class);
+	private static void applyOwnerOnlyAcl(Path path, boolean directory) throws IOException {
+		AclFileAttributeView aclView = Files.getFileAttributeView(path, AclFileAttributeView.class);
 		if (aclView == null) {
-			throw new IllegalStateException("[" + DEFAULTS_FILE_ENV
-					+ "] Unable to apply owner-only permissions on this filesystem for "
-					+ path.getFileName());
+			throw unableToVerifyOwnerOnly(path);
 		}
 		UserPrincipal owner = aclView.getOwner();
-		AclEntry entry = AclEntry.newBuilder()
+		AclEntry.Builder entryBuilder = AclEntry.newBuilder()
 				.setType(AclEntryType.ALLOW)
 				.setPrincipal(owner)
-				.setPermissions(
-						AclEntryPermission.READ_DATA,
-						AclEntryPermission.WRITE_DATA,
-						AclEntryPermission.EXECUTE,
-						AclEntryPermission.READ_NAMED_ATTRS,
-						AclEntryPermission.WRITE_NAMED_ATTRS)
-				.setFlags(AclEntryFlag.FILE_INHERIT, AclEntryFlag.DIRECTORY_INHERIT)
-				.build();
-		List<AclEntry> acl = new ArrayList<>();
-		acl.add(entry);
-		aclView.setAcl(acl);
+				.setPermissions(EnumSet.allOf(AclEntryPermission.class));
+		if (directory) {
+			entryBuilder.setFlags(AclEntryFlag.FILE_INHERIT, AclEntryFlag.DIRECTORY_INHERIT);
+		}
+		aclView.setAcl(List.of(entryBuilder.build()));
 	}
 }
