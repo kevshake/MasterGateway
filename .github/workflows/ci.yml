@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'cursor/**']
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate ephemeral test secrets
+        run: |
+          echo "GATEWAY_ADMIN_PASSWORD=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+          echo "H2_DATASOURCE_PASSWORD=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Unit and integration tests
+        run: ./mvnw -B test
+      - name: OWASP dependency-check (fail on CVSS >= 7)
+        run: ./mvnw -B org.owasp:dependency-check-maven:check

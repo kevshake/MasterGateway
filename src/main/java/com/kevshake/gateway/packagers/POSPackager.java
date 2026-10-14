@@ -139,7 +139,6 @@ public class POSPackager extends ISOBasePackager {
         /*127*/ new IFA_LLLCHAR(999, "Reserved for private use"),
         /*128*/ new IFB_BINARY(16, "Message authentication code field")
     };
-    
     public POSPackager() {
         super();
         setFieldPackager(fld);

@@ -102,7 +102,7 @@ public class TransactionProcessor {
             return ResponseCodes.SYSTEM_ERROR;
         }
     }
-    
+    /** Implements processTransactionByType for TransactionProcessor. */
     private String processTransactionByType(String processingCode, String pan, String amount, ISOMsg msg) {
         switch (processingCode) {
             case ProcessingCodes.PURCHASE:
@@ -128,7 +128,7 @@ public class TransactionProcessor {
                 return ResponseCodes.INVALID_TRANSACTION;
         }
     }
-    
+    /** Implements processPurchaseTransaction for TransactionProcessor. */
     private String processPurchaseTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing purchase transaction");
         
@@ -166,7 +166,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
+    /** Implements processCashAdvanceTransaction for TransactionProcessor. */
     private String processCashAdvanceTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing cash advance transaction");
         
@@ -191,7 +191,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
+    /** Implements processRefundTransaction for TransactionProcessor. */
     private String processRefundTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing refund transaction");
         
@@ -208,7 +208,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
+    /** Implements processBalanceInquiryTransaction for TransactionProcessor. */
     private String processBalanceInquiryTransaction(String pan, ISOMsg msg) {
         log.info("Processing balance inquiry transaction");
         
@@ -219,7 +219,7 @@ public class TransactionProcessor {
         // Balance inquiry is usually approved if card is valid
         return ResponseCodes.APPROVED;
     }
-    
+    /** Implements processPaymentTransaction for TransactionProcessor. */
     private String processPaymentTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing payment transaction");
         
@@ -239,7 +239,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
+    /** Implements processTransferTransaction for TransactionProcessor. */
     private String processTransferTransaction(String pan, String amount, ISOMsg msg) {
         log.info("Processing transfer transaction");
         
@@ -296,7 +296,7 @@ public class TransactionProcessor {
             return ResponseCodes.SYSTEM_ERROR;
         }
     }
-    
+    /** Implements processSignOn for TransactionProcessor. */
     private String processSignOn(ISOMsg msg) {
         log.info("Processing sign-on request");
         
@@ -308,7 +308,7 @@ public class TransactionProcessor {
         // In real implementation, validate terminal and merchant
         return ResponseCodes.APPROVED;
     }
-    
+    /** Implements processSignOff for TransactionProcessor. */
     private String processSignOff(ISOMsg msg) {
         log.info("Processing sign-off request");
         
@@ -317,7 +317,7 @@ public class TransactionProcessor {
         
         return ResponseCodes.APPROVED;
     }
-    
+    /** Implements processEchoTest for TransactionProcessor. */
     private String processEchoTest(ISOMsg msg) {
         log.info("Processing echo test");
         return ResponseCodes.APPROVED;
@@ -364,18 +364,19 @@ public class TransactionProcessor {
         // Simple Luhn algorithm check (for demo purposes)
         return pan.startsWith("4") || pan.startsWith("5") || pan.startsWith("6"); // Visa, MC, Discover
     }
-    
+    /** Implements hasSufficientBalance for TransactionProcessor. */
     private boolean hasSufficientBalance(String pan, long amount) {
         // Sample balance check logic
         // In real implementation, check against account balance
         return amount <= 200000; // Sample limit of $2000
     }
-    
+    /** Implements hasCashAdvanceLimit for TransactionProcessor. */
     private boolean hasCashAdvanceLimit(String pan, long amount) {
         // Sample cash advance limit check
         return amount <= 50000; // Sample limit of $500
     }
     
+    /** Indicates whether restricted merchant. */
     private boolean isRestrictedMerchant(String merchantCategory) {
         // Sample merchant restriction logic
         if (merchantCategory == null) return false;
@@ -384,21 +385,23 @@ public class TransactionProcessor {
         return "7995".equals(merchantCategory);
     }
     
+    /** Indicates whether valid destination account. */
     private boolean isValidDestinationAccount(String account) {
         // Sample destination account validation
         return account != null && account.length() >= 10;
     }
     
+    /** Indicates whether duplicate transaction. */
     private boolean isDuplicateTransaction(String stan, String date) {
         String key = stan + "_" + date;
         return transactionDatabase.containsKey(key);
     }
-    
+    /** Implements hasOriginalTransaction for TransactionProcessor. */
     private boolean hasOriginalTransaction(String rrn) {
         return transactionDatabase.values().stream()
                 .anyMatch(t -> rrn.equals(t.getRrn()));
     }
-    
+    /** Implements storeTransaction for TransactionProcessor. */
     private void storeTransaction(ISOMsg msg, String responseCode) {
         try {
             String key = msg.getString(11) + "_" + msg.getString(13);
@@ -420,12 +423,12 @@ public class TransactionProcessor {
             log.error("Error storing transaction", e);
         }
     }
-    
+    /** Implements findOriginalTransaction for TransactionProcessor. */
     private TransactionRecord findOriginalTransaction(String stan, String date) {
         String key = stan + "_" + date;
         return transactionDatabase.get(key);
     }
-    
+    /** Implements reverseTransaction for TransactionProcessor. */
     private boolean reverseTransaction(TransactionRecord original) {
         // Sample reversal logic
         log.info("Reversing transaction: STAN={}, Amount={}", 
@@ -436,12 +439,12 @@ public class TransactionProcessor {
         
         return true;
     }
-    
+    /** Implements maskPan for TransactionProcessor. */
     private String maskPan(String pan) {
         if (pan == null || pan.length() < 8) return "****";
         return pan.substring(0, 4) + "****" + pan.substring(pan.length() - 4);
     }
-    
+    /** Implements generateRRN for TransactionProcessor. */
     private String generateRRN() {
         return String.format("%012d", System.currentTimeMillis() % 1000000000000L);
     }
@@ -459,35 +462,46 @@ public class TransactionProcessor {
         private LocalDateTime timestamp;
         private boolean reversed = false;
         
-        // Getters and setters
+        /** ISO8583 STAN (field 11) for this audit row. */
         public String getStan() { return stan; }
+        /** Sets the stan. */
         public void setStan(String stan) { this.stan = stan; }
-        
+        /** Local transaction date from the ISO message. */
         public String getDate() { return date; }
+        /** Sets the date. */
         public void setDate(String date) { this.date = date; }
-        
+        /** Local transaction time from the ISO message. */
         public String getTime() { return time; }
+        /** Sets the time. */
         public void setTime(String time) { this.time = time; }
-        
+        /** Primary account number stored on the record. */
         public String getPan() { return pan; }
+        /** Sets the pan. */
         public void setPan(String pan) { this.pan = pan; }
-        
+        /** Transaction amount as received on the wire. */
         public String getAmount() { return amount; }
+        /** Sets the amount. */
         public void setAmount(String amount) { this.amount = amount; }
-        
+        /** ISO8583 processing code (field 3). */
         public String getProcessingCode() { return processingCode; }
+        /** Sets the processing code. */
         public void setProcessingCode(String processingCode) { this.processingCode = processingCode; }
-        
+        /** ISO8583 response code (field 39). */
         public String getResponseCode() { return responseCode; }
+        /** Sets the response code. */
         public void setResponseCode(String responseCode) { this.responseCode = responseCode; }
-        
+        /** Retrieval reference number (field 37). */
         public String getRrn() { return rrn; }
+        /** Sets the rrn. */
         public void setRrn(String rrn) { this.rrn = rrn; }
-        
+        /** When the gateway recorded this transaction. */
         public LocalDateTime getTimestamp() { return timestamp; }
+        /** Sets the timestamp. */
         public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-        
+
+        /** Whether this record was reversed by a follow-up message. */
         public boolean isReversed() { return reversed; }
+    /** Sets the reversed. */
         public void setReversed(boolean reversed) { this.reversed = reversed; }
     }
 }

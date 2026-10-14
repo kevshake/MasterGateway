@@ -64,7 +64,6 @@ public class TerminalKey {
 
     // Constructors
     public TerminalKey() {}
-
     public TerminalKey(String keyValue, String keyType, Integer keyLength) {
         this.keyValue = keyValue;
         this.keyType = keyType;
@@ -81,101 +80,112 @@ public class TerminalKey {
         PENDING("Pending - Awaiting activation");
 
         private final String description;
-
         KeyStatus(String description) {
             this.description = description;
         }
-
+        /** Description of this key status enum constant. */
         public String getDescription() {
             return description;
         }
     }
 
     // Getters and Setters
+    /** Surrogate primary key for the key row. */
     public Long getKeyId() {
         return keyId;
     }
 
+    /** Sets the key id. */
     public void setKeyId(Long keyId) {
         this.keyId = keyId;
     }
-
+    /** Encrypted PIN key material (never log). */
     public String getKeyValue() {
         return keyValue;
     }
 
+    /** Sets the key value. */
     public void setKeyValue(String keyValue) {
         this.keyValue = keyValue;
     }
-
+    /** Key usage type (e.g. PIN encryption). */
     public String getKeyType() {
         return keyType;
     }
 
+    /** Sets the key type. */
     public void setKeyType(String keyType) {
         this.keyType = keyType;
     }
-
+    /** Activation lifecycle for this key. */
     public KeyStatus getKeyStatus() {
         return keyStatus;
     }
 
+    /** Sets the key status. */
     public void setKeyStatus(KeyStatus keyStatus) {
         this.keyStatus = keyStatus;
     }
-
+    /** Key check value (KCV) for HSM verification. */
     public String getKeyCheckValue() {
         return keyCheckValue;
     }
 
+    /** Sets the key check value. */
     public void setKeyCheckValue(String keyCheckValue) {
         this.keyCheckValue = keyCheckValue;
     }
-
+    /** TDES key length indicator (single/double/triple). */
     public Integer getKeyLength() {
         return keyLength;
     }
 
+    /** Sets the key length. */
     public void setKeyLength(Integer keyLength) {
         this.keyLength = keyLength;
     }
-
+    /** When the key row was created. */
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
+    /** Sets the created date. */
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
-
+    /** When the key row was last updated. */
     public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
 
+    /** Sets the updated date. */
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
-
+    /** When this key must be rotated or deactivated. */
     public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
 
+    /** Sets the expiry date. */
     public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
     }
-
+    /** Operator notes for this key. */
     public String getNotes() {
         return notes;
     }
 
+    /** Sets the notes. */
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
+    /** Owning terminal for this key. */
     public Terminal getTerminal() {
         return terminal;
     }
 
+    /** Sets the terminal. */
     public void setTerminal(Terminal terminal) {
         this.terminal = terminal;
     }
@@ -185,23 +195,24 @@ public class TerminalKey {
         return keyStatus == KeyStatus.ACTIVE;
     }
 
+    /** Indicates whether expired. */
     public boolean isExpired() {
         return keyStatus == KeyStatus.EXPIRED || 
                (expiryDate != null && expiryDate.isBefore(LocalDateTime.now()));
     }
-
+    /** Implements activate for TerminalKey. */
     public void activate() {
         this.keyStatus = KeyStatus.ACTIVE;
     }
-
+    /** Implements deactivate for TerminalKey. */
     public void deactivate() {
         this.keyStatus = KeyStatus.INACTIVE;
     }
-
+    /** Implements expire for TerminalKey. */
     public void expire() {
         this.keyStatus = KeyStatus.EXPIRED;
     }
-
+    /** Implements markCompromised for TerminalKey. */
     public void markCompromised() {
         this.keyStatus = KeyStatus.COMPROMISED;
     }
@@ -215,6 +226,7 @@ public class TerminalKey {
     }
 
     @Override
+    /** Implements equals for TerminalKey. */
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -223,11 +235,13 @@ public class TerminalKey {
     }
 
     @Override
+    /** Implements hashCode for TerminalKey. */
     public int hashCode() {
         return Objects.hash(keyId);
     }
 
     @Override
+    /** Implements toString for TerminalKey. */
     public String toString() {
         return "TerminalKey{" +
                 "keyId=" + keyId +

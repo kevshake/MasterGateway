@@ -36,17 +36,14 @@ public class CardValidationService {
         
         private final String displayName;
         private final String pattern;
-        
         CardType(String displayName, String pattern) {
             this.displayName = displayName;
             this.pattern = pattern;
         }
-        
-        public String getDisplayName() {
+    public String getDisplayName() {
             return displayName;
         }
-        
-        public String getPattern() {
+    public String getPattern() {
             return pattern;
         }
     }
@@ -60,7 +57,6 @@ public class CardValidationService {
         private final CardType cardType;
         private final String maskedPan;
         private final String errorMessage;
-        
         public CardValidationResult(boolean valid, boolean luhnValid, CardType cardType, String maskedPan, String errorMessage) {
             this.valid = valid;
             this.luhnValid = luhnValid;
@@ -69,13 +65,16 @@ public class CardValidationService {
             this.errorMessage = errorMessage;
         }
         
+    /** Indicates whether valid. */
         public boolean isValid() { return valid; }
+    /** Indicates whether luhn valid. */
         public boolean isLuhnValid() { return luhnValid; }
-        public CardType getCardType() { return cardType; }
-        public String getMaskedPan() { return maskedPan; }
-        public String getErrorMessage() { return errorMessage; }
+    public CardType getCardType() { return cardType; }
+    public String getMaskedPan() { return maskedPan; }
+    public String getErrorMessage() { return errorMessage; }
         
         @Override
+        /** Implements toString for CardValidationService. */
         public String toString() {
             return String.format("CardValidationResult{valid=%s, luhnValid=%s, cardType=%s, maskedPan='%s', errorMessage='%s'}", 
                 valid, luhnValid, cardType.getDisplayName(), maskedPan, errorMessage);

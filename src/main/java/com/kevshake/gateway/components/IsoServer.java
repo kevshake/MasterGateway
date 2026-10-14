@@ -40,8 +40,14 @@ public class IsoServer {
     private EventLoopGroup workerGroup;
     private ChannelFuture serverFuture;
 
+    /** Starts the Netty POS ISO8583 listener when enabled in configuration. */
     @PostConstruct
+    /** Implements startServer for IsoServer. */
     public void startServer() {
+        if (!config.getPos().isNettyServerEnabled()) {
+            log.info("ISO8583 Netty POS server disabled (iso8583.pos.netty-server-enabled=false)");
+            return;
+        }
         // Start server in a separate thread to avoid blocking Spring startup
         new Thread(() -> {
             bossGroup = new NioEventLoopGroup(1);
@@ -51,7 +57,9 @@ public class IsoServer {
                 .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
+                    /** Installs length framing, ISO codecs, and the business handler on each POS socket. */
                     @Override
+                    /** Implements initChannel for IsoServer. */
                     protected void initChannel(SocketChannel ch) {
                         ch.pipeline()
                             .addLast(new LengthFieldBasedFrameDecoder(10240, 0, 2, 0, 2))
@@ -85,7 +93,9 @@ public class IsoServer {
         }, "ISO8583-Server").start();
     }
     
+    /** Shuts down Netty boss/worker groups for the POS ISO8583 listener. */
     @PreDestroy
+    /** Implements shutdown for IsoServer. */
     public void shutdown() {
         log.info("Shutting down ISO8583 Server");
         

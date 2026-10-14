@@ -58,6 +58,7 @@ public class BankCommunicationProcessor {
     private boolean isConnected = false;
     
     @PostConstruct
+    /** Implements initialize for BankCommunicationProcessor. */
     public void initialize() {
         try {
             // Initialize bank packager
@@ -350,6 +351,7 @@ public class BankCommunicationProcessor {
     }
     
     @PreDestroy
+    /** Implements shutdown for BankCommunicationProcessor. */
     public void shutdown() {
         logger.info("Shutting down Bank Communication Processor");
         

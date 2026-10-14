@@ -373,7 +373,6 @@ public class ResponseCodeService {
         private final String description;
         private final ResponseSeverity severity;
         private final ResponseCategory category;
-
         public ResponseCodeInfo(String code, String description, ResponseSeverity severity, ResponseCategory category) {
             this.code = code;
             this.description = description;
@@ -381,13 +380,17 @@ public class ResponseCodeService {
             this.category = category;
         }
 
-        // Getters
+        /** ISO8583 response code (field 39). */
         public String getCode() { return code; }
+        /** Human-readable response text. */
         public String getDescription() { return description; }
+        /** Operational severity for monitoring. */
         public ResponseSeverity getSeverity() { return severity; }
+        /** High-level approval/decline/error grouping. */
         public ResponseCategory getCategory() { return category; }
 
         @Override
+        /** Implements toString for ResponseCodeService. */
         public String toString() {
             return String.format("ResponseCode{code='%s', description='%s', severity=%s, category=%s}", 
                                code, description, severity, category);

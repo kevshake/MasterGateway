@@ -49,14 +49,17 @@ public class Iso8583Config {
         return packager;
     }
     
+    /** Sets the packager. */
     public void setPackager(String packager) {
         this.packager = packager;
     }
     
+    /** ISO8583 field format map (field number to encoding type) from {@code iso8583.fields}. */
     public Map<Integer, String> getFields() {
         return fields;
     }
     
+    /** Sets the fields. */
     public void setFields(Map<Integer, String> fields) {
         this.fields = fields;
     }

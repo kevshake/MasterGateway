@@ -52,6 +52,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
     @Value("${iso8583.terminal.enable-key-change:true}")
     private boolean enableKeyChange;
     
+    /** Routes each inbound ISO8583 message by MTI after validation and optional bank forwarding. */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ISOMsg msg) {
         try {
@@ -155,7 +156,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
                 return false;
         }
     }
-
+    /** Implements handleAuthorizationRequest for IsoServerHandler. */
     private void handleAuthorizationRequest(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Authorization Request");
         
@@ -199,7 +200,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
             sendErrorResponse(ctx, msg, "96"); // System Error
         }
     }
-
+    /** Implements handlePosAuthorization for IsoServerHandler. */
     private void handlePosAuthorization(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing POS Authorization Request");
         
@@ -231,7 +232,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
             sendErrorResponse(ctx, msg, "96");
         }
     }
-
+    /** Implements handleReversalRequest for IsoServerHandler. */
     private void handleReversalRequest(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Reversal Request");
         
@@ -259,7 +260,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
             sendErrorResponse(ctx, msg, "96");
         }
     }
-
+    /** Implements handleAuthorizationAdvice for IsoServerHandler. */
     private void handleAuthorizationAdvice(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Authorization Advice");
         
@@ -272,7 +273,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         // Process advice (update records, etc.)
         processAdvice(msg);
     }
-
+    /** Implements handleReversalAdvice for IsoServerHandler. */
     private void handleReversalAdvice(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Reversal Advice");
         
@@ -282,7 +283,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         // Process reversal advice
         processReversalAdvice(msg);
     }
-
+    /** Implements handleNetworkManagement for IsoServerHandler. */
     private void handleNetworkManagement(ChannelHandlerContext ctx, ISOMsg msg) {
         log.info("Processing Network Management Request");
         
@@ -467,12 +468,12 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
             log.warn("Error updating terminal activity for {}: {}", terminalId, e.getMessage());
         }
     }
-
+    /** Implements handleUnsupportedMessage for IsoServerHandler. */
     private void handleUnsupportedMessage(ChannelHandlerContext ctx, ISOMsg msg) {
         log.warn("Unsupported message type");
         sendErrorResponse(ctx, msg, "12"); // Invalid Transaction
     }
-
+    /** Implements handleError for IsoServerHandler. */
     private void handleError(ChannelHandlerContext ctx, ISOMsg msg, Exception e) {
         log.error("General error handling message", e);
         sendErrorResponse(ctx, msg, "96"); // System Error
@@ -497,12 +498,12 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
                 return "12"; // Invalid Transaction
         }
     }
-
+    /** Implements processPosTransaction for IsoServerHandler. */
     private String processPosTransaction(String processingCode, String amount, String pan) {
         // POS-specific transaction processing
         return processTransaction(processingCode, amount, pan);
     }
-
+    /** Implements processPurchase for IsoServerHandler. */
     private String processPurchase(String amount, String pan) {
         // Sample purchase logic
         if (amount != null && Long.parseLong(amount) > 100000) { // Amount over 1000.00
@@ -510,7 +511,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
         return "00"; // Approved
     }
-
+    /** Implements processCashAdvance for IsoServerHandler. */
     private String processCashAdvance(String amount, String pan) {
         // Sample cash advance logic
         if (amount != null && Long.parseLong(amount) > 50000) { // Amount over 500.00
@@ -518,28 +519,28 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
         return "00"; // Approved
     }
-
+    /** Implements processRefund for IsoServerHandler. */
     private String processRefund(String amount, String pan) {
         // Sample refund logic
         return "00"; // Approved
     }
-
+    /** Implements processBalanceInquiry for IsoServerHandler. */
     private String processBalanceInquiry(String pan) {
         // Sample balance inquiry logic
         return "00"; // Approved
     }
-
+    /** Implements processReversal for IsoServerHandler. */
     private boolean processReversal(String originalStan, String originalDate, String amount) {
         // Sample reversal processing
         log.info("Processing reversal for STAN: {}, Date: {}", originalStan, originalDate);
         return true; // Assume successful
     }
-
+    /** Implements processAdvice for IsoServerHandler. */
     private void processAdvice(ISOMsg msg) {
         // Process advice message (logging, database updates, etc.)
         log.info("Advice processed");
     }
-
+    /** Implements processReversalAdvice for IsoServerHandler. */
     private void processReversalAdvice(ISOMsg msg) {
         // Process reversal advice
         log.info("Reversal advice processed");
@@ -560,7 +561,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
             log.error("Error copying request fields", e);
         }
     }
-
+    /** Implements sendErrorResponse for IsoServerHandler. */
     private void sendErrorResponse(ChannelHandlerContext ctx, ISOMsg request, String responseCode) {
         try {
             String requestMti = request.getString(0);
@@ -606,6 +607,7 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
         }
     }
 
+    /** Maps inbound request MTI to the matching ISO8583 response MTI. */
     private String getResponseMti(String requestMti) {
         // Convert request MTI to response MTI
         switch (requestMti) {
@@ -616,17 +618,17 @@ public class IsoServerHandler extends SimpleChannelInboundHandler<ISOMsg> {
             default: return "0210"; // Default to authorization response
         }
     }
-
+    /** Implements generateRRN for IsoServerHandler. */
     private String generateRRN() {
         // Generate Retrieval Reference Number
         return String.format("%012d", System.currentTimeMillis() % 1000000000000L);
     }
-
+    /** Implements generateAuthCode for IsoServerHandler. */
     private String generateAuthCode() {
         // Generate Authorization Code
         return String.format("%06d", (int) (Math.random() * 1000000));
     }
-
+    /** Implements maskPan for IsoServerHandler. */
     private String maskPan(String pan) {
         if (pan == null || pan.length() < 8) return "****";
         return pan.substring(0, 4) + "****" + pan.substring(pan.length() - 4);

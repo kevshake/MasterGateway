@@ -85,13 +85,11 @@ public class Terminal {
 
     // Constructors
     public Terminal() {}
-
     public Terminal(String terminalId) {
         this.terminalId = terminalId;
         this.status = TerminalStatus.ACTIVE;
         this.keyChangeCount = 0;
     }
-
     public Terminal(String terminalId, String merchantId) {
         this(terminalId);
         this.merchantId = merchantId;
@@ -106,141 +104,157 @@ public class Terminal {
         DECOMMISSIONED("Decommissioned - Permanently disabled");
 
         private final String description;
-
         TerminalStatus(String description) {
             this.description = description;
         }
-
+        /** Human-readable label for this terminal status enum constant. */
         public String getDescription() {
             return description;
         }
     }
 
     // Getters and Setters
+    /** Surrogate primary key. */
     public Long getId() {
         return id;
     }
 
+    /** Sets the id. */
     public void setId(Long id) {
         this.id = id;
     }
-
+    /** Acquirer-facing terminal identifier. */
     public String getTerminalId() {
         return terminalId;
     }
 
+    /** Sets the terminal id. */
     public void setTerminalId(String terminalId) {
         this.terminalId = terminalId;
     }
-
+    /** Merchant id owning this terminal. */
     public String getMerchantId() {
         return merchantId;
     }
 
+    /** Sets the merchant id. */
     public void setMerchantId(String merchantId) {
         this.merchantId = merchantId;
     }
-
+    /** Display name for operations consoles. */
     public String getTerminalName() {
         return terminalName;
     }
 
+    /** Sets the terminal name. */
     public void setTerminalName(String terminalName) {
         this.terminalName = terminalName;
     }
-
+    /** Physical or logical site description. */
     public String getLocation() {
         return location;
     }
 
+    /** Sets the location. */
     public void setLocation(String location) {
         this.location = location;
     }
-
+    /** Lifecycle status governing authorization. */
     public TerminalStatus getStatus() {
         return status;
     }
 
+    /** Sets the status. */
     public void setStatus(TerminalStatus status) {
         this.status = status;
     }
-
+    /** Hardware or channel type (POS, ATM, etc.). */
     public String getTerminalType() {
         return terminalType;
     }
 
+    /** Sets the terminal type. */
     public void setTerminalType(String terminalType) {
         this.terminalType = terminalType;
     }
-
+    /** Device serial number when provisioned. */
     public String getSerialNumber() {
         return serialNumber;
     }
 
+    /** Sets the serial number. */
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
-
+    /** Reported firmware or application version. */
     public String getSoftwareVersion() {
         return softwareVersion;
     }
 
+    /** Sets the software version. */
     public void setSoftwareVersion(String softwareVersion) {
         this.softwareVersion = softwareVersion;
     }
-
+    /** Row creation timestamp. */
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
+    /** Sets the created date. */
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
-
+    /** Last update timestamp. */
     public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
 
+    /** Sets the updated date. */
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
-
+    /** Last ISO8583 activity seen from this terminal. */
     public LocalDateTime getLastActivityDate() {
         return lastActivityDate;
     }
 
+    /** Sets the last activity date. */
     public void setLastActivityDate(LocalDateTime lastActivityDate) {
         this.lastActivityDate = lastActivityDate;
     }
-
+    /** Number of PIN key changes performed. */
     public Integer getKeyChangeCount() {
         return keyChangeCount;
     }
 
+    /** Sets the key change count. */
     public void setKeyChangeCount(Integer keyChangeCount) {
         this.keyChangeCount = keyChangeCount;
     }
-
+    /** When the current key was last rotated. */
     public LocalDateTime getLastKeyChangeDate() {
         return lastKeyChangeDate;
     }
 
+    /** Sets the last key change date. */
     public void setLastKeyChangeDate(LocalDateTime lastKeyChangeDate) {
         this.lastKeyChangeDate = lastKeyChangeDate;
     }
-
+    /** Free-form operator notes. */
     public String getNotes() {
         return notes;
     }
 
+    /** Sets the notes. */
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
+    /** Active PIN key association for this terminal. */
     public TerminalKey getTerminalKey() {
         return terminalKey;
     }
 
+    /** Sets the terminal key. */
     public void setTerminalKey(TerminalKey terminalKey) {
         this.terminalKey = terminalKey;
         if (terminalKey != null) {
@@ -252,40 +266,41 @@ public class Terminal {
     public boolean isActive() {
         return status == TerminalStatus.ACTIVE;
     }
-
+    /** Implements canProcessTransactions for Terminal. */
     public boolean canProcessTransactions() {
         return status == TerminalStatus.ACTIVE && hasValidKey();
     }
-
+    /** Implements hasValidKey for Terminal. */
     public boolean hasValidKey() {
         return terminalKey != null && terminalKey.isActive() && !terminalKey.isExpired();
     }
-
+    /** Implements updateLastActivity for Terminal. */
     public void updateLastActivity() {
         this.lastActivityDate = LocalDateTime.now();
     }
-
+    /** Implements incrementKeyChangeCount for Terminal. */
     public void incrementKeyChangeCount() {
         this.keyChangeCount = (this.keyChangeCount == null) ? 1 : this.keyChangeCount + 1;
         this.lastKeyChangeDate = LocalDateTime.now();
     }
-
+    /** Implements activate for Terminal. */
     public void activate() {
         this.status = TerminalStatus.ACTIVE;
     }
-
+    /** Implements deactivate for Terminal. */
     public void deactivate() {
         this.status = TerminalStatus.INACTIVE;
     }
-
+    /** Implements suspend for Terminal. */
     public void suspend() {
         this.status = TerminalStatus.SUSPENDED;
     }
 
+    /** Sets the maintenance. */
     public void setMaintenance() {
         this.status = TerminalStatus.MAINTENANCE;
     }
-
+    /** Implements decommission for Terminal. */
     public void decommission() {
         this.status = TerminalStatus.DECOMMISSIONED;
         if (terminalKey != null) {
@@ -300,7 +315,6 @@ public class Terminal {
         }
         return terminalId;
     }
-
     public String getKeyInfo() {
         if (terminalKey == null) {
             return "No key assigned";
@@ -311,6 +325,7 @@ public class Terminal {
     }
 
     @Override
+    /** Implements equals for Terminal. */
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -319,11 +334,13 @@ public class Terminal {
     }
 
     @Override
+    /** Implements hashCode for Terminal. */
     public int hashCode() {
         return Objects.hash(terminalId);
     }
 
     @Override
+    /** Implements toString for Terminal. */
     public String toString() {
         return "Terminal{" +
                 "id=" + id +
