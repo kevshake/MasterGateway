@@ -14,9 +14,9 @@ Never log or commit production secret values. Historical sample PIN keys and ban
 
 When any of the five environment variables above is **unset** at startup, the gateway:
 
-1. Loads prior install defaults from `GATEWAY_GENERATED_DEFAULTS_FILE` (default: `~/.mastergateway/generated-defaults.properties`, owner-only permissions when supported).
-2. Generates any still-missing secrets once per install (`SecureRandom` passwords; double-length TDES hex keys with odd parity; bank host **`127.0.0.1`**).
-3. Persists new secrets to that file (never logged) and injects them into the Spring environment.
+1. Loads prior install defaults from `GATEWAY_GENERATED_DEFAULTS_FILE` (default: `~/.mastergateway/generated-defaults.properties`). The parent directory is created **0700** and the file **0600** on POSIX; startup **fails** if owner-only permissions cannot be applied (ACL fallback on non-POSIX, otherwise `[GATEWAY_GENERATED_DEFAULTS_FILE]`). Loaded keys must be 32-hex TDES with odd parity; passwords must be at least 16 characters; files readable by other users or not owned by the current user are rejected (errors name the file setting and entry key, never values).
+2. Under an exclusive lock on a sibling `*.lock` file, re-reads the file and generates any still-missing secrets once per install (`SecureRandom` passwords; double-length TDES hex keys with odd parity; bank host **`127.0.0.1`**).
+3. Persists via a temp file in the same directory (owner-only), fsync, and atomic replace; injects resolved values into the Spring environment and records which settings were defaulted in `gateway.internal.defaulted-settings` (read by the hourly reminder from the `Environment`, not static state).
 4. Prints and logs a **banner per defaulted setting** (setting name, env var, alignment points, how to set). Repeats the same text at **WARN every hour** until operators export real values.
 
 Actuator `/actuator/health` remains **status-only** (no flag for generated defaults).
