@@ -20,19 +20,17 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 	private static final int MIN_PASSWORD_LENGTH = 16;
 
 	/**
-	 * SHA-256 (hex, lowercase) of the sample zonal PIN key documented only in {@code application-local.yml}
-	 * (historical local-dev TDES hex material).
+	 * SHA-256 (hex, lowercase) of the sample zonal PIN key documented only in historical local YAML.
 	 */
 	private static final String SAMPLE_ZONAL_KEY_SHA256 = "77ccd67cbb79ad78efff935e67c237cbe0e219026eb887654ad810c6cfc966e2";
 
 	/**
-	 * SHA-256 (hex, lowercase) of the sample default terminal PIN key documented only in
-	 * {@code application-local.yml}.
+	 * SHA-256 (hex, lowercase) of the sample default terminal PIN key documented only in historical local YAML.
 	 */
 	private static final String SAMPLE_TERMINAL_KEY_SHA256 = "de80ce38b4251c2a9ce36261265062e6eae40dd397fa7a66b15abcb0d1fc236e";
 
 	/**
-	 * SHA-256 (hex, lowercase) of the sample bank/switch host documented only in {@code application-local.yml}.
+	 * SHA-256 (hex, lowercase) of the sample bank/switch host documented only in historical local YAML.
 	 */
 	private static final String SAMPLE_BANK_HOST_SHA256 = "2a39f1eedcd9f986327b5e4da842426f4f05b8f16f0ef385639dbec0db70eaae";
 
@@ -50,9 +48,11 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 			"integrationtest-admin-pass-32chars!",
 			"integrationtest-h2-pass-32chars!!");
 
-	/** Applies password, H2, and PCI operational secret rules to the environment before refresh. */
+	/** Generates missing defaults, then validates resolved configuration. */
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+		rejectUnsafeExplicitValues(environment);
+		GatewayGeneratedDefaultsBootstrap.applyMissingDefaults(environment);
 		validateAdminPassword(environment);
 		validateH2Console(environment);
 		validateH2DatasourcePassword(environment);
@@ -65,37 +65,74 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 		return Ordered.HIGHEST_PRECEDENCE + 10;
 	}
 
-	/** Rejects missing, short, placeholder, or blocklisted admin passwords. */
-	private static void validateAdminPassword(ConfigurableEnvironment environment) {
-		String password = firstNonBlank(
-				environment.getProperty("GATEWAY_ADMIN_PASSWORD"),
-				environment.getProperty("spring.security.user.password"));
-		if (isUnresolvedPlaceholder(password)) {
-			throw illegalState(
-					"GATEWAY_ADMIN_PASSWORD / spring.security.user.password",
-					"Admin password placeholder is unresolved.",
-					"Set env GATEWAY_ADMIN_PASSWORD (bound to spring.security.user.password). "
-							+ "Also set in: CI workflow env (openssl rand per run), runtime pod/VM secret, and docs/GATEWAY_CONFIGURATION.md. "
-							+ "Minimum 16 characters; must not match known unsafe defaults.");
-		}
-		if (password == null || password.isBlank()) {
-			throw illegalState(
-					"GATEWAY_ADMIN_PASSWORD / spring.security.user.password",
-					"Admin password is not set.",
-					"Export GATEWAY_ADMIN_PASSWORD before startup (CI job env or pod/VM secret). "
-							+ "Used for HTTP Basic on /h2-console when spring.profiles.active=local only.");
+	/** Fails fast when an operator-set value is weak or matches a known sample fingerprint. */
+	private static void rejectUnsafeExplicitValues(ConfigurableEnvironment environment) {
+		validateExplicitPassword(environment, GatewaySettingKind.ADMIN_PASSWORD);
+		validateExplicitPassword(environment, GatewaySettingKind.H2_DATASOURCE_PASSWORD);
+		validateExplicitOperationalSecret(environment, GatewaySettingKind.ZONAL_PIN_KEY, SAMPLE_ZONAL_KEY_SHA256, true);
+		validateExplicitOperationalSecret(environment, GatewaySettingKind.DEFAULT_TERMINAL_PIN_KEY, SAMPLE_TERMINAL_KEY_SHA256, true);
+		validateExplicitOperationalSecret(environment, GatewaySettingKind.BANK_HOST, SAMPLE_BANK_HOST_SHA256, false);
+	}
+
+	/** Validates an operator-supplied password before generated defaults are applied. */
+	private static void validateExplicitPassword(ConfigurableEnvironment environment, GatewaySettingKind kind) {
+		String password = readConfiguredValue(environment, kind);
+		if (isUnset(password)) {
+			return;
 		}
 		if (password.length() < MIN_PASSWORD_LENGTH) {
 			throw illegalState(
-					"GATEWAY_ADMIN_PASSWORD",
-					"Admin password is shorter than " + MIN_PASSWORD_LENGTH + " characters.",
-					"Use a longer GATEWAY_ADMIN_PASSWORD (minimum " + MIN_PASSWORD_LENGTH + " characters).");
+					kind.environmentVariable() + " / " + kind.configurationProperty(),
+					"Password is shorter than " + MIN_PASSWORD_LENGTH + " characters.",
+					kind.howToSet());
 		}
 		if (KNOWN_UNSAFE_PASSWORDS.contains(password.toLowerCase(Locale.ROOT))) {
 			throw illegalState(
-					"GATEWAY_ADMIN_PASSWORD",
+					kind.environmentVariable(),
+					"Password matches a known unsafe or committed test default.",
+					kind.howToSet());
+		}
+	}
+
+	/** Validates an operator-supplied key or host before generated defaults are applied. */
+	private static void validateExplicitOperationalSecret(
+			ConfigurableEnvironment environment,
+			GatewaySettingKind kind,
+			String sampleSha256,
+			boolean hexKey) {
+		String value = readConfiguredValue(environment, kind);
+		if (isUnset(value)) {
+			return;
+		}
+		String normalized = hexKey ? normalizeHex(value) : value.trim();
+		if (isSampleSecretHash(normalized, sampleSha256)) {
+			throw illegalState(
+					kind.environmentVariable() + " / " + kind.configurationProperty(),
+					"Value matches the repository sample fingerprint.",
+					kind.howToSet() + " Must also match: " + kind.mustMatchElsewhere());
+		}
+	}
+
+	/** Rejects missing, short, placeholder, or blocklisted admin passwords after defaults injection. */
+	private static void validateAdminPassword(ConfigurableEnvironment environment) {
+		String password = readConfiguredValue(environment, GatewaySettingKind.ADMIN_PASSWORD);
+		if (isUnset(password)) {
+			throw illegalState(
+					GatewaySettingKind.ADMIN_PASSWORD.environmentVariable(),
+					"Admin password is still unset after generated defaults.",
+					GatewaySettingKind.ADMIN_PASSWORD.howToSet());
+		}
+		if (password.length() < MIN_PASSWORD_LENGTH) {
+			throw illegalState(
+					GatewaySettingKind.ADMIN_PASSWORD.environmentVariable(),
+					"Admin password is shorter than " + MIN_PASSWORD_LENGTH + " characters.",
+					GatewaySettingKind.ADMIN_PASSWORD.howToSet());
+		}
+		if (KNOWN_UNSAFE_PASSWORDS.contains(password.toLowerCase(Locale.ROOT))) {
+			throw illegalState(
+					GatewaySettingKind.ADMIN_PASSWORD.environmentVariable(),
 					"Admin password matches a known unsafe or committed test default.",
-					"Generate a unique GATEWAY_ADMIN_PASSWORD (e.g. openssl rand -base64 32) for CI and each environment.");
+					GatewaySettingKind.ADMIN_PASSWORD.howToSet());
 		}
 	}
 
@@ -114,88 +151,79 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 		}
 	}
 
-	/** Ensures the in-memory H2 datasource password is set and not blocklisted. */
+	/** Ensures the in-memory H2 datasource password is set and not blocklisted after defaults injection. */
 	private static void validateH2DatasourcePassword(ConfigurableEnvironment environment) {
-		String h2Password = firstNonBlank(
-				environment.getProperty("spring.datasource.password"),
-				environment.getProperty("H2_DATASOURCE_PASSWORD"));
-		if (isUnresolvedPlaceholder(h2Password)) {
+		String h2Password = readConfiguredValue(environment, GatewaySettingKind.H2_DATASOURCE_PASSWORD);
+		if (isUnset(h2Password)) {
 			throw illegalState(
-					"H2_DATASOURCE_PASSWORD / spring.datasource.password",
-					"H2 datasource password placeholder is unresolved.",
-					"Set env H2_DATASOURCE_PASSWORD (maps to spring.datasource.password). "
-							+ "Also set in: CI workflow env (openssl rand per run), runtime pod/VM secret, and docs/GATEWAY_CONFIGURATION.md.");
-		}
-		if (h2Password == null || h2Password.isBlank()) {
-			throw illegalState(
-					"H2_DATASOURCE_PASSWORD",
-					"H2 datasource password is not set.",
-					"Export H2_DATASOURCE_PASSWORD for the in-memory terminal JPA database.");
+					GatewaySettingKind.H2_DATASOURCE_PASSWORD.environmentVariable(),
+					"H2 datasource password is still unset after generated defaults.",
+					GatewaySettingKind.H2_DATASOURCE_PASSWORD.howToSet());
 		}
 		if (KNOWN_UNSAFE_PASSWORDS.contains(h2Password.toLowerCase(Locale.ROOT))) {
 			throw illegalState(
-					"H2_DATASOURCE_PASSWORD",
+					GatewaySettingKind.H2_DATASOURCE_PASSWORD.environmentVariable(),
 					"H2 datasource password matches a known unsafe or committed test default.",
-					"Generate a unique H2_DATASOURCE_PASSWORD per environment.");
+					GatewaySettingKind.H2_DATASOURCE_PASSWORD.howToSet());
 		}
 	}
 
-	/** Blocks sample PCI fingerprints and unset keys/hosts outside local-only profile. */
+	/** Ensures operational secrets and bank host are present and not sample fingerprints after defaults injection. */
 	private static void validateOperationalSecrets(ConfigurableEnvironment environment) {
-		if (isLocalOnlyProfile(environment)) {
-			return;
-		}
-		String zonalKey = firstNonBlank(
-				environment.getProperty("GATEWAY_ZONAL_KEY"),
-				environment.getProperty("iso8583.security.gateway-zonal-key"));
-		String terminalKey = firstNonBlank(
-				environment.getProperty("GATEWAY_DEFAULT_TERMINAL_KEY"),
-				environment.getProperty("iso8583.security.default-terminal-key"));
-		String bankHost = firstNonBlank(
-				environment.getProperty("ISO8583_BANK_HOST"),
-				environment.getProperty("iso8583.bank.host"));
+		String zonalKey = readConfiguredValue(environment, GatewaySettingKind.ZONAL_PIN_KEY);
+		String terminalKey = readConfiguredValue(environment, GatewaySettingKind.DEFAULT_TERMINAL_PIN_KEY);
+		String bankHost = readConfiguredValue(environment, GatewaySettingKind.BANK_HOST);
 
-		if (isBlankOrPlaceholder(zonalKey)) {
+		if (isUnset(zonalKey)) {
 			throw illegalState(
-					"GATEWAY_ZONAL_KEY / iso8583.security.gateway-zonal-key",
-					"Gateway zonal PIN key is not configured.",
-					"Set env GATEWAY_ZONAL_KEY (maps to iso8583.security.gateway-zonal-key). "
-							+ "Must match: bank/switch HSM key ceremony record and live switch PIN zone. "
-							+ "Never use repository sample keys outside spring.profiles.active=local.");
+					GatewaySettingKind.ZONAL_PIN_KEY.environmentVariable(),
+					"Gateway zonal PIN key is still unset after generated defaults.",
+					GatewaySettingKind.ZONAL_PIN_KEY.howToSet());
 		}
 		if (isSampleSecretHash(normalizeHex(zonalKey), SAMPLE_ZONAL_KEY_SHA256)) {
 			throw illegalState(
-					"GATEWAY_ZONAL_KEY / iso8583.security.gateway-zonal-key",
+					GatewaySettingKind.ZONAL_PIN_KEY.environmentVariable(),
 					"Gateway zonal PIN key matches the repository sample fingerprint.",
-					"Load production key from HSM ceremony; align with bank/switch and docs/GATEWAY_CONFIGURATION.md.");
+					GatewaySettingKind.ZONAL_PIN_KEY.howToSet());
 		}
 
-		if (isBlankOrPlaceholder(terminalKey)) {
+		if (isUnset(terminalKey)) {
 			throw illegalState(
-					"GATEWAY_DEFAULT_TERMINAL_KEY / iso8583.security.default-terminal-key",
-					"Default terminal PIN key is not configured.",
-					"Set env GATEWAY_DEFAULT_TERMINAL_KEY. Must align with TerminalKey table and terminal/SDK provisioning.");
+					GatewaySettingKind.DEFAULT_TERMINAL_PIN_KEY.environmentVariable(),
+					"Default terminal PIN key is still unset after generated defaults.",
+					GatewaySettingKind.DEFAULT_TERMINAL_PIN_KEY.howToSet());
 		}
 		if (isSampleSecretHash(normalizeHex(terminalKey), SAMPLE_TERMINAL_KEY_SHA256)) {
 			throw illegalState(
-					"GATEWAY_DEFAULT_TERMINAL_KEY / iso8583.security.default-terminal-key",
+					GatewaySettingKind.DEFAULT_TERMINAL_PIN_KEY.environmentVariable(),
 					"Default terminal PIN key matches the repository sample fingerprint.",
-					"Provision per-terminal keys in TerminalKey and SDK; do not use sample material outside local profile.");
+					GatewaySettingKind.DEFAULT_TERMINAL_PIN_KEY.howToSet());
 		}
 
-		if (isBlankOrPlaceholder(bankHost)) {
+		if (isUnset(bankHost)) {
 			throw illegalState(
-					"ISO8583_BANK_HOST / iso8583.bank.host",
-					"Bank/switch host is not configured.",
-					"Set env ISO8583_BANK_HOST (maps to iso8583.bank.host). "
-							+ "Must match deploy/21_bank_channel.xml host and bank TLS/mTLS allow-list.");
+					GatewaySettingKind.BANK_HOST.environmentVariable(),
+					"Bank/switch host is still unset after generated defaults.",
+					GatewaySettingKind.BANK_HOST.howToSet());
 		}
 		if (isSampleSecretHash(bankHost.trim(), SAMPLE_BANK_HOST_SHA256)) {
 			throw illegalState(
-					"ISO8583_BANK_HOST / iso8583.bank.host",
+					GatewaySettingKind.BANK_HOST.environmentVariable(),
 					"Bank/switch host matches the repository sample fingerprint.",
-					"Point iso8583.bank.host at the live switch endpoint; update deploy/21_bank_channel.xml and TLS trust.");
+					GatewaySettingKind.BANK_HOST.howToSet());
 		}
+	}
+
+	/** Reads env or property for a logical gateway setting. */
+	static String readConfiguredValue(ConfigurableEnvironment environment, GatewaySettingKind kind) {
+		return firstNonBlank(
+				environment.getProperty(kind.environmentVariable()),
+				environment.getProperty(kind.configurationProperty()));
+	}
+
+	/** True when the value is absent or still an unresolved placeholder. */
+	static boolean isUnset(String value) {
+		return value == null || value.isBlank() || isUnresolvedPlaceholder(value);
 	}
 
 	/** True when exactly one active Spring profile is {@code local}. */
@@ -210,11 +238,6 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 	/** Detects unresolved {@code ${...}} property placeholders. */
 	private static boolean isUnresolvedPlaceholder(String value) {
 		return value != null && value.startsWith("${") && value.endsWith("}");
-	}
-
-	/** True for null, blank, or unresolved placeholder values. */
-	private static boolean isBlankOrPlaceholder(String value) {
-		return value == null || value.isBlank() || isUnresolvedPlaceholder(value);
 	}
 
 	/** Returns the first non-blank string, or null when both are absent. */
