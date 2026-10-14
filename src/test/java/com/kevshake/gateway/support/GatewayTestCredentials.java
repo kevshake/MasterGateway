@@ -1,5 +1,6 @@
 package com.kevshake.gateway.support;
 
+import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -19,7 +20,8 @@ public final class GatewayTestCredentials {
 			"H2_DATASOURCE_PASSWORD",
 			"GATEWAY_ZONAL_KEY",
 			"GATEWAY_DEFAULT_TERMINAL_KEY",
-			"ISO8583_BANK_HOST");
+			"ISO8583_BANK_HOST",
+			"GATEWAY_GENERATED_DEFAULTS_FILE");
 
 	private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -39,6 +41,8 @@ public final class GatewayTestCredentials {
 
 	private static volatile String cachedBankHost;
 
+	private static volatile Path integrationGeneratedDefaultsFile;
+
 	private GatewayTestCredentials() {
 	}
 
@@ -47,6 +51,7 @@ public final class GatewayTestCredentials {
 	 * sees them before {@code @DynamicPropertySource} runs.
 	 */
 	public static void installEarlyEnvironmentSecrets() {
+		setSystemPropertyIfAbsent("GATEWAY_GENERATED_DEFAULTS_FILE", GatewayTestCredentials::generatedDefaultsFile);
 		setSystemPropertyIfAbsent("GATEWAY_ADMIN_PASSWORD", GatewayTestCredentials::adminPassword);
 		setSystemPropertyIfAbsent("H2_DATASOURCE_PASSWORD", GatewayTestCredentials::h2DatasourcePassword);
 		setSystemPropertyIfAbsent("GATEWAY_ZONAL_KEY", GatewayTestCredentials::zonalKey);
@@ -79,6 +84,7 @@ public final class GatewayTestCredentials {
 
 	/** Registers required gateway secrets and non-sample operational properties for integration tests. */
 	public static void registerIntegrationProperties(DynamicPropertyRegistry registry) {
+		registry.add("GATEWAY_GENERATED_DEFAULTS_FILE", GatewayTestCredentials::generatedDefaultsFile);
 		registry.add("spring.datasource.url", () -> INTEGRATION_H2_JDBC_URL);
 		registry.add("spring.datasource.driver-class-name", () -> "org.h2.Driver");
 		registry.add("spring.datasource.username", () -> "sa");
@@ -125,6 +131,17 @@ public final class GatewayTestCredentials {
 			cachedTerminalKey = fromEnvOrHex("GATEWAY_DEFAULT_TERMINAL_KEY", 32);
 			return cachedTerminalKey;
 		});
+	}
+
+	/** Resolves an isolated generated-defaults file path for integration tests (never under the user home). */
+	public static String generatedDefaultsFile() {
+		if (integrationGeneratedDefaultsFile == null) {
+			integrationGeneratedDefaultsFile = Path.of(
+					System.getProperty("java.io.tmpdir"),
+					"mastergateway-it-" + UUID.randomUUID(),
+					"generated-defaults.properties");
+		}
+		return integrationGeneratedDefaultsFile.toString();
 	}
 
 	/** Supplies a non-sample bank host for non-local integration tests. */

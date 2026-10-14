@@ -3,10 +3,11 @@ package com.kevshake.gateway.config;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
@@ -23,64 +24,48 @@ final class GatewayGeneratedDefaultsBootstrap {
 	private GatewayGeneratedDefaultsBootstrap() {
 	}
 
-	/** Supplies generated values for unset settings and records which keys were defaulted. */
+	/** Supplies generated values for unset settings and records which keys were defaulted in the environment. */
 	static void applyMissingDefaults(ConfigurableEnvironment environment) {
 		String configuredFile = environment.getProperty(GatewayGeneratedDefaultsFileStore.DEFAULTS_FILE_ENV);
 		Path defaultsFile = GatewayGeneratedDefaultsFileStore.resolveDefaultsFilePath(configuredFile);
-		Map<GatewaySettingKind, String> persisted = loadPersisted(defaultsFile);
-		List<GatewayDefaultedSettingsRegistry.GatewayDefaultedSetting> defaulted = new ArrayList<>();
-		Map<String, Object> injected = new HashMap<>();
-		Map<GatewaySettingKind, String> newlyGenerated = new EnumMap<>(GatewaySettingKind.class);
-
+		Set<GatewaySettingKind> missingKinds = EnumSet.noneOf(GatewaySettingKind.class);
 		for (GatewaySettingKind kind : GatewaySettingKind.values()) {
-			String existing = GatewayEnvironmentValidator.readConfiguredValue(environment, kind);
-			if (!GatewayEnvironmentValidator.isUnset(existing)) {
-				continue;
+			if (GatewayEnvironmentValidator.isUnset(GatewayEnvironmentValidator.readConfiguredValue(environment, kind))) {
+				missingKinds.add(kind);
 			}
-			String value = persisted.get(kind);
+		}
+		Map<GatewaySettingKind, String> resolved = missingKinds.isEmpty()
+				? Map.of()
+				: loadOrGenerate(defaultsFile, missingKinds);
+		List<GatewayDefaultedSetting> defaulted = new ArrayList<>();
+		Map<String, Object> injected = new HashMap<>();
+
+		for (GatewaySettingKind kind : missingKinds) {
+			String value = resolved.get(kind);
 			if (value == null || value.isBlank()) {
-				value = generateValue(kind);
-				newlyGenerated.put(kind, value);
+				throw new IllegalStateException("[" + kind.environmentVariable()
+						+ "] Generated default missing after persistence.");
 			}
 			inject(kind, value, injected);
-			defaulted.add(new GatewayDefaultedSettingsRegistry.GatewayDefaultedSetting(kind));
+			defaulted.add(new GatewayDefaultedSetting(kind));
 		}
 
-		if (!newlyGenerated.isEmpty()) {
-			persistNewValues(defaultsFile, newlyGenerated, persisted);
-		}
 		injected.put(INTERNAL_DEFAULTS_FILE_PROPERTY, defaultsFile.toString());
+		injected.put(GatewayDefaultedSettingsSupport.DEFAULTED_SETTINGS_PROPERTY,
+				GatewayDefaultedSettingsSupport.encodeDefaultedSettings(defaulted));
 		if (!injected.isEmpty()) {
 			environment.getPropertySources()
 					.addFirst(new MapPropertySource("gatewayGeneratedDefaults", injected));
 		}
-		GatewayDefaultedSettingsRegistry.publish(defaulted);
 	}
 
-	/** Loads persisted secrets, returning empty when the file is absent or unreadable. */
-	private static Map<GatewaySettingKind, String> loadPersisted(Path defaultsFile) {
+	/** Loads persisted values and generates any still-missing entries under an exclusive file lock. */
+	private static Map<GatewaySettingKind, String> loadOrGenerate(Path defaultsFile, Set<GatewaySettingKind> missingKinds) {
 		try {
-			return GatewayGeneratedDefaultsFileStore.load(defaultsFile);
+			return GatewayGeneratedDefaultsFileStore.loadOrGenerateMissing(defaultsFile, missingKinds);
 		} catch (IOException ex) {
 			throw new IllegalStateException(
-					"[" + GatewayGeneratedDefaultsFileStore.DEFAULTS_FILE_ENV + "] Unable to read generated defaults file.",
-					ex);
-		}
-	}
-
-	/** Writes freshly generated secrets so later restarts reuse the same install defaults. */
-	private static void persistNewValues(
-			Path defaultsFile,
-			Map<GatewaySettingKind, String> newlyGenerated,
-			Map<GatewaySettingKind, String> persisted) {
-		Map<GatewaySettingKind, String> toSave = new EnumMap<>(GatewaySettingKind.class);
-		toSave.putAll(persisted);
-		toSave.putAll(newlyGenerated);
-		try {
-			GatewayGeneratedDefaultsFileStore.save(defaultsFile, toSave);
-		} catch (IOException ex) {
-			throw new IllegalStateException(
-					"[" + GatewayGeneratedDefaultsFileStore.DEFAULTS_FILE_ENV + "] Unable to write generated defaults file.",
+					"[" + GatewayGeneratedDefaultsFileStore.DEFAULTS_FILE_ENV + "] Unable to access generated defaults file.",
 					ex);
 		}
 	}
@@ -89,14 +74,5 @@ final class GatewayGeneratedDefaultsBootstrap {
 	private static void inject(GatewaySettingKind kind, String value, Map<String, Object> target) {
 		target.put(kind.environmentVariable(), value);
 		target.put(kind.configurationProperty(), value);
-	}
-
-	/** Creates a new secret or host default for the given setting kind. */
-	private static String generateValue(GatewaySettingKind kind) {
-		return switch (kind) {
-			case ADMIN_PASSWORD, H2_DATASOURCE_PASSWORD -> GatewayGeneratedDefaultsFileStore.generateStrongPassword();
-			case ZONAL_PIN_KEY, DEFAULT_TERMINAL_PIN_KEY -> GatewayTdesKeyMaterialGenerator.generateDoubleLengthTdesHexKey();
-			case BANK_HOST -> DEFAULT_BANK_HOST;
-		};
 	}
 }

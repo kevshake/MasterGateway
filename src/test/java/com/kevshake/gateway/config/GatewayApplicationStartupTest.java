@@ -102,6 +102,7 @@ class GatewayApplicationStartupTest {
 	/** Builds command-line properties with at most one entry per key so CI env cannot mask overrides. */
 	private static String[] startupArgs(String... overrideArgs) {
 		Map<String, String> values = new LinkedHashMap<>();
+		values.put("GATEWAY_GENERATED_DEFAULTS_FILE", GatewayTestCredentials.generatedDefaultsFile());
 		values.put("GATEWAY_ADMIN_PASSWORD", GatewayTestCredentials.adminPassword());
 		values.put("H2_DATASOURCE_PASSWORD", GatewayTestCredentials.h2DatasourcePassword());
 		values.put("GATEWAY_ZONAL_KEY", GatewayTestCredentials.zonalKey());
