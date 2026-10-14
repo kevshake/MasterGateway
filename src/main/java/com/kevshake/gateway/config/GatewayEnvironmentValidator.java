@@ -19,14 +19,22 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 
 	private static final int MIN_PASSWORD_LENGTH = 16;
 
-	/** SHA-256 (hex) of sample zonal key committed historically in application-local.yml. */
-	private static final String SAMPLE_ZONAL_KEY_SHA256 = sha256Hex("40763BB5B0B910B5CE3297E58967CD2A");
+	/**
+	 * SHA-256 (hex, lowercase) of the sample zonal PIN key documented only in {@code application-local.yml}
+	 * (historical local-dev TDES hex material).
+	 */
+	private static final String SAMPLE_ZONAL_KEY_SHA256 = "77ccd67cbb79ad78efff935e67c237cbe0e219026eb887654ad810c6cfc966e2";
 
-	/** SHA-256 (hex) of sample terminal key committed historically in application-local.yml. */
-	private static final String SAMPLE_TERMINAL_KEY_SHA256 = sha256Hex("9E4F7FF1F831F1132CD9B6C740B0134C");
+	/**
+	 * SHA-256 (hex, lowercase) of the sample default terminal PIN key documented only in
+	 * {@code application-local.yml}.
+	 */
+	private static final String SAMPLE_TERMINAL_KEY_SHA256 = "de80ce38b4251c2a9ce36261265062e6eae40dd397fa7a66b15abcb0d1fc236e";
 
-	/** SHA-256 (hex) of the sample bank host literal 192.168.1.100. */
-	private static final String SAMPLE_BANK_HOST_SHA256 = sha256Hex("192.168.1.100");
+	/**
+	 * SHA-256 (hex, lowercase) of the sample bank/switch host documented only in {@code application-local.yml}.
+	 */
+	private static final String SAMPLE_BANK_HOST_SHA256 = "2a39f1eedcd9f986327b5e4da842426f4f05b8f16f0ef385639dbec0db70eaae";
 
 	private static final Set<String> KNOWN_UNSAFE_PASSWORDS = Set.of(
 			"change-me-local",
@@ -67,14 +75,14 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 					"GATEWAY_ADMIN_PASSWORD / spring.security.user.password",
 					"Admin password placeholder is unresolved.",
 					"Set env GATEWAY_ADMIN_PASSWORD (bound to spring.security.user.password). "
-							+ "Also set in: CI GitHub Actions secrets, runtime pod/VM env, and docs/GATEWAY_CONFIGURATION.md. "
+							+ "Also set in: CI workflow env (openssl rand per run), runtime pod/VM secret, and docs/GATEWAY_CONFIGURATION.md. "
 							+ "Minimum 16 characters; must not match known unsafe defaults.");
 		}
 		if (password == null || password.isBlank()) {
 			throw illegalState(
 					"GATEWAY_ADMIN_PASSWORD / spring.security.user.password",
 					"Admin password is not set.",
-					"Export GATEWAY_ADMIN_PASSWORD before startup (CI secret, runtime env). "
+					"Export GATEWAY_ADMIN_PASSWORD before startup (CI job env or pod/VM secret). "
 							+ "Used for HTTP Basic on /h2-console when spring.profiles.active=local only.");
 		}
 		if (password.length() < MIN_PASSWORD_LENGTH) {
@@ -116,7 +124,7 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 					"H2_DATASOURCE_PASSWORD / spring.datasource.password",
 					"H2 datasource password placeholder is unresolved.",
 					"Set env H2_DATASOURCE_PASSWORD (maps to spring.datasource.password). "
-							+ "Also set in: CI secrets, runtime env, and docs/GATEWAY_CONFIGURATION.md.");
+							+ "Also set in: CI workflow env (openssl rand per run), runtime pod/VM secret, and docs/GATEWAY_CONFIGURATION.md.");
 		}
 		if (h2Password == null || h2Password.isBlank()) {
 			throw illegalState(
@@ -230,7 +238,7 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 		return sampleSha256Hex.equals(sha256Hex(normalizedValue));
 	}
 
-	/** Computes lowercase SHA-256 hex for sample fingerprint checks. */
+	/** Computes lowercase SHA-256 hex for runtime fingerprint comparison (never logged). */
 	private static String sha256Hex(String value) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");

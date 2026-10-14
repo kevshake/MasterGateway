@@ -21,10 +21,10 @@ public class PinTranspositionService {
     private MaskedLogger maskedLogger;
     
     // Configuration for PIN keys - these should be loaded from secure configuration
-    @Value("${iso8583.security.gateway-zonal-key:40763BB5B0B910B5CE3297E58967CD2A}")
+    @Value("${iso8583.security.gateway-zonal-key}")
     private String gatewayZonalKey;
     
-    @Value("${iso8583.security.default-terminal-key:9E4F7FF1F831F1132CD9B6C740B0134C}")
+    @Value("${iso8583.security.default-terminal-key}")
     private String defaultTerminalKey;
     
     /**

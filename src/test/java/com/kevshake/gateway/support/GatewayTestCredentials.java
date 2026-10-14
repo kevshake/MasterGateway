@@ -1,7 +1,11 @@
 package com.kevshake.gateway.support;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 
@@ -10,11 +14,20 @@ import org.springframework.test.context.DynamicPropertyRegistry;
  */
 public final class GatewayTestCredentials {
 
+	public static final List<String> MANAGED_SYSTEM_PROPERTY_KEYS = List.of(
+			"GATEWAY_ADMIN_PASSWORD",
+			"H2_DATASOURCE_PASSWORD",
+			"GATEWAY_ZONAL_KEY",
+			"GATEWAY_DEFAULT_TERMINAL_KEY",
+			"ISO8583_BANK_HOST");
+
 	private static final SecureRandom RANDOM = new SecureRandom();
 
 	private static final String INTEGRATION_H2_JDBC_URL = "jdbc:h2:mem:gateway-it-"
-			+ java.util.UUID.randomUUID()
+			+ UUID.randomUUID()
 			+ ";DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE";
+
+	private static final List<String> keysSetByTestHarness = Collections.synchronizedList(new ArrayList<>());
 
 	private static volatile String cachedAdminPassword;
 
@@ -41,6 +54,17 @@ public final class GatewayTestCredentials {
 		setSystemPropertyIfAbsent("ISO8583_BANK_HOST", GatewayTestCredentials::bankHost);
 	}
 
+	/** Removes system properties previously set by this test harness (does not unset process environment). */
+	public static void clearManagedSystemProperties() {
+		for (String key : MANAGED_SYSTEM_PROPERTY_KEYS) {
+			if (keysSetByTestHarness.contains(key)) {
+				System.clearProperty(key);
+			}
+		}
+		keysSetByTestHarness.clear();
+	}
+
+	/** Sets a system property only when absent, preferring an existing environment variable over generated values. */
 	private static void setSystemPropertyIfAbsent(String key, java.util.function.Supplier<String> supplier) {
 		if (System.getProperty(key) == null || System.getProperty(key).isBlank()) {
 			String fromEnv = System.getenv(key);
@@ -48,6 +72,7 @@ public final class GatewayTestCredentials {
 				System.setProperty(key, fromEnv);
 			} else {
 				System.setProperty(key, supplier.get());
+				keysSetByTestHarness.add(key);
 			}
 		}
 	}

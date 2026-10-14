@@ -19,9 +19,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 @EnableWebSecurity
 public class GatewaySecurityConfiguration {
 
-	/**
-	 * Permits anonymous access to actuator health while exposing only the top-level status (no component details).
-	 */
+	/** Anonymous actuator health with status-only payload (no component breakdown). */
 	@Bean
 	@Order(1)
 	SecurityFilterChain actuatorHealthSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -34,9 +32,7 @@ public class GatewaySecurityConfiguration {
 		return http.build();
 	}
 
-	/**
-	 * Protects the H2 console with HTTP Basic authentication when the local profile is active.
-	 */
+	/** HTTP Basic on {@code /h2-console/**} when the local profile is active. */
 	@Bean
 	@Order(2)
 	@Profile("local")
@@ -49,9 +45,7 @@ public class GatewaySecurityConfiguration {
 		return http.build();
 	}
 
-	/**
-	 * Denies every other HTTP route so unmatched servlet traffic cannot bypass the scoped chains above.
-	 */
+	/** Deny-all fallback so no servlet route bypasses the scoped chains above. */
 	@Bean
 	@Order(3)
 	SecurityFilterChain denyAllCatchAllSecurityFilterChain(HttpSecurity http) throws Exception {

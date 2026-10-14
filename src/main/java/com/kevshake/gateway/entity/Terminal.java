@@ -107,12 +107,14 @@ public class Terminal {
         TerminalStatus(String description) {
             this.description = description;
         }
-    public String getDescription() {
+        /** Human-readable label for this terminal status enum constant. */
+        public String getDescription() {
             return description;
         }
     }
 
     // Getters and Setters
+    /** Surrogate primary key. */
     public Long getId() {
         return id;
     }
@@ -121,6 +123,7 @@ public class Terminal {
     public void setId(Long id) {
         this.id = id;
     }
+    /** Acquirer-facing terminal identifier. */
     public String getTerminalId() {
         return terminalId;
     }
@@ -129,6 +132,7 @@ public class Terminal {
     public void setTerminalId(String terminalId) {
         this.terminalId = terminalId;
     }
+    /** Merchant id owning this terminal. */
     public String getMerchantId() {
         return merchantId;
     }
@@ -137,6 +141,7 @@ public class Terminal {
     public void setMerchantId(String merchantId) {
         this.merchantId = merchantId;
     }
+    /** Display name for operations consoles. */
     public String getTerminalName() {
         return terminalName;
     }
@@ -145,6 +150,7 @@ public class Terminal {
     public void setTerminalName(String terminalName) {
         this.terminalName = terminalName;
     }
+    /** Physical or logical site description. */
     public String getLocation() {
         return location;
     }
@@ -153,6 +159,7 @@ public class Terminal {
     public void setLocation(String location) {
         this.location = location;
     }
+    /** Lifecycle status governing authorization. */
     public TerminalStatus getStatus() {
         return status;
     }
@@ -161,6 +168,7 @@ public class Terminal {
     public void setStatus(TerminalStatus status) {
         this.status = status;
     }
+    /** Hardware or channel type (POS, ATM, etc.). */
     public String getTerminalType() {
         return terminalType;
     }
@@ -169,6 +177,7 @@ public class Terminal {
     public void setTerminalType(String terminalType) {
         this.terminalType = terminalType;
     }
+    /** Device serial number when provisioned. */
     public String getSerialNumber() {
         return serialNumber;
     }
@@ -177,6 +186,7 @@ public class Terminal {
     public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
+    /** Reported firmware or application version. */
     public String getSoftwareVersion() {
         return softwareVersion;
     }
@@ -185,6 +195,7 @@ public class Terminal {
     public void setSoftwareVersion(String softwareVersion) {
         this.softwareVersion = softwareVersion;
     }
+    /** Row creation timestamp. */
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
@@ -193,6 +204,7 @@ public class Terminal {
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
+    /** Last update timestamp. */
     public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
@@ -201,6 +213,7 @@ public class Terminal {
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
+    /** Last ISO8583 activity seen from this terminal. */
     public LocalDateTime getLastActivityDate() {
         return lastActivityDate;
     }
@@ -209,6 +222,7 @@ public class Terminal {
     public void setLastActivityDate(LocalDateTime lastActivityDate) {
         this.lastActivityDate = lastActivityDate;
     }
+    /** Number of PIN key changes performed. */
     public Integer getKeyChangeCount() {
         return keyChangeCount;
     }
@@ -217,6 +231,7 @@ public class Terminal {
     public void setKeyChangeCount(Integer keyChangeCount) {
         this.keyChangeCount = keyChangeCount;
     }
+    /** When the current key was last rotated. */
     public LocalDateTime getLastKeyChangeDate() {
         return lastKeyChangeDate;
     }
@@ -225,6 +240,7 @@ public class Terminal {
     public void setLastKeyChangeDate(LocalDateTime lastKeyChangeDate) {
         this.lastKeyChangeDate = lastKeyChangeDate;
     }
+    /** Free-form operator notes. */
     public String getNotes() {
         return notes;
     }
@@ -233,6 +249,7 @@ public class Terminal {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+    /** Active PIN key association for this terminal. */
     public TerminalKey getTerminalKey() {
         return terminalKey;
     }

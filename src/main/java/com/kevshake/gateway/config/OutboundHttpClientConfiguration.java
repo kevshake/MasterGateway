@@ -19,9 +19,7 @@ public class OutboundHttpClientConfiguration {
 	@Value("${gateway.http.read-timeout-ms:30000}")
 	private int readTimeoutMs;
 
-	/**
-	 * Builds the shared outbound HTTP client used by future bank or orchestration REST integrations.
-	 */
+	/** Shared JDK {@link HttpClient} with connect timeout from {@code gateway.http.connect-timeout-ms}. */
 	@Bean
 	HttpClient gatewayHttpClient() {
 		return HttpClient.newBuilder()

@@ -83,12 +83,14 @@ public class TerminalKey {
         KeyStatus(String description) {
             this.description = description;
         }
-    public String getDescription() {
+        /** Description of this key status enum constant. */
+        public String getDescription() {
             return description;
         }
     }
 
     // Getters and Setters
+    /** Surrogate primary key for the key row. */
     public Long getKeyId() {
         return keyId;
     }
@@ -97,6 +99,7 @@ public class TerminalKey {
     public void setKeyId(Long keyId) {
         this.keyId = keyId;
     }
+    /** Encrypted PIN key material (never log). */
     public String getKeyValue() {
         return keyValue;
     }
@@ -105,6 +108,7 @@ public class TerminalKey {
     public void setKeyValue(String keyValue) {
         this.keyValue = keyValue;
     }
+    /** Key usage type (e.g. PIN encryption). */
     public String getKeyType() {
         return keyType;
     }
@@ -113,6 +117,7 @@ public class TerminalKey {
     public void setKeyType(String keyType) {
         this.keyType = keyType;
     }
+    /** Activation lifecycle for this key. */
     public KeyStatus getKeyStatus() {
         return keyStatus;
     }
@@ -121,6 +126,7 @@ public class TerminalKey {
     public void setKeyStatus(KeyStatus keyStatus) {
         this.keyStatus = keyStatus;
     }
+    /** Key check value (KCV) for HSM verification. */
     public String getKeyCheckValue() {
         return keyCheckValue;
     }
@@ -129,6 +135,7 @@ public class TerminalKey {
     public void setKeyCheckValue(String keyCheckValue) {
         this.keyCheckValue = keyCheckValue;
     }
+    /** TDES key length indicator (single/double/triple). */
     public Integer getKeyLength() {
         return keyLength;
     }
@@ -137,6 +144,7 @@ public class TerminalKey {
     public void setKeyLength(Integer keyLength) {
         this.keyLength = keyLength;
     }
+    /** When the key row was created. */
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
@@ -145,6 +153,7 @@ public class TerminalKey {
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
+    /** When the key row was last updated. */
     public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
@@ -153,6 +162,7 @@ public class TerminalKey {
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
+    /** When this key must be rotated or deactivated. */
     public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
@@ -161,6 +171,7 @@ public class TerminalKey {
     public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
     }
+    /** Operator notes for this key. */
     public String getNotes() {
         return notes;
     }
@@ -169,6 +180,7 @@ public class TerminalKey {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+    /** Owning terminal for this key. */
     public Terminal getTerminal() {
         return terminal;
     }

@@ -462,36 +462,44 @@ public class TransactionProcessor {
         private LocalDateTime timestamp;
         private boolean reversed = false;
         
-        // Getters and setters
+        /** ISO8583 STAN (field 11) for this audit row. */
         public String getStan() { return stan; }
-    /** Sets the stan. */
+        /** Sets the stan. */
         public void setStan(String stan) { this.stan = stan; }
-    public String getDate() { return date; }
-    /** Sets the date. */
+        /** Local transaction date from the ISO message. */
+        public String getDate() { return date; }
+        /** Sets the date. */
         public void setDate(String date) { this.date = date; }
-    public String getTime() { return time; }
-    /** Sets the time. */
+        /** Local transaction time from the ISO message. */
+        public String getTime() { return time; }
+        /** Sets the time. */
         public void setTime(String time) { this.time = time; }
-    public String getPan() { return pan; }
-    /** Sets the pan. */
+        /** Primary account number stored on the record. */
+        public String getPan() { return pan; }
+        /** Sets the pan. */
         public void setPan(String pan) { this.pan = pan; }
-    public String getAmount() { return amount; }
-    /** Sets the amount. */
+        /** Transaction amount as received on the wire. */
+        public String getAmount() { return amount; }
+        /** Sets the amount. */
         public void setAmount(String amount) { this.amount = amount; }
-    public String getProcessingCode() { return processingCode; }
-    /** Sets the processing code. */
+        /** ISO8583 processing code (field 3). */
+        public String getProcessingCode() { return processingCode; }
+        /** Sets the processing code. */
         public void setProcessingCode(String processingCode) { this.processingCode = processingCode; }
-    public String getResponseCode() { return responseCode; }
-    /** Sets the response code. */
+        /** ISO8583 response code (field 39). */
+        public String getResponseCode() { return responseCode; }
+        /** Sets the response code. */
         public void setResponseCode(String responseCode) { this.responseCode = responseCode; }
-    public String getRrn() { return rrn; }
-    /** Sets the rrn. */
+        /** Retrieval reference number (field 37). */
+        public String getRrn() { return rrn; }
+        /** Sets the rrn. */
         public void setRrn(String rrn) { this.rrn = rrn; }
-    public LocalDateTime getTimestamp() { return timestamp; }
-    /** Sets the timestamp. */
+        /** When the gateway recorded this transaction. */
+        public LocalDateTime getTimestamp() { return timestamp; }
+        /** Sets the timestamp. */
         public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-        
-    /** Indicates whether reversed. */
+
+        /** Whether this record was reversed by a follow-up message. */
         public boolean isReversed() { return reversed; }
     /** Sets the reversed. */
         public void setReversed(boolean reversed) { this.reversed = reversed; }
