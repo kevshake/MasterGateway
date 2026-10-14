@@ -1,10 +1,10 @@
-# Local developer profile only — sample PCI material permitted here, not in base application.yml.
+# Local developer profile — enable H2 console; set secrets via env or install generated defaults file.
 iso8583:
   bank:
-    host: 192.168.1.100
+    host: ${ISO8583_BANK_HOST}
   security:
-    gateway-zonal-key: 40763BB5B0B910B5CE3297E58967CD2A
-    default-terminal-key: 9E4F7FF1F831F1132CD9B6C740B0134C
+    gateway-zonal-key: ${GATEWAY_ZONAL_KEY}
+    default-terminal-key: ${GATEWAY_DEFAULT_TERMINAL_KEY}
 
 spring:
   h2:

@@ -83,6 +83,9 @@ gateway:
     connect-timeout-ms: 5000
     read-timeout-ms: 30000
 
+# Optional: path for install-generated secrets (see docs/GATEWAY_CONFIGURATION.md).
+# Env: GATEWAY_GENERATED_DEFAULTS_FILE
+
 management:
   endpoints:
     web:

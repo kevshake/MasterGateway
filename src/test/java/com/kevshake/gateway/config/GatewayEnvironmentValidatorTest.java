@@ -1,9 +1,13 @@
 package com.kevshake.gateway.config;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.SpringApplication;
 import org.springframework.mock.env.MockEnvironment;
 
@@ -13,11 +17,16 @@ class GatewayEnvironmentValidatorTest {
 
 	private final GatewayEnvironmentValidator validator = new GatewayEnvironmentValidator();
 
-	/** Ensures startup fails when the admin password is absent on the default profile. */
+	@TempDir
+	Path tempDir;
+
+	/** Ensures missing admin password receives a generated default instead of failing startup. */
 	@Test
-	void rejectsMissingAdminPasswordOnDefaultProfile() {
-		MockEnvironment env = baseEnv();
-		assertThrows(IllegalStateException.class, () -> validator.postProcessEnvironment(env, new SpringApplication()));
+	void appliesGeneratedDefaultWhenAdminPasswordMissing() {
+		MockEnvironment env = baseEnvWithoutAdmin();
+		env.setProperty("GATEWAY_GENERATED_DEFAULTS_FILE", tempDir.resolve("defaults.properties").toString());
+		assertDoesNotThrow(() -> validator.postProcessEnvironment(env, new SpringApplication()));
+		assertFalse(GatewayEnvironmentValidator.isUnset(env.getProperty("GATEWAY_ADMIN_PASSWORD")));
 	}
 
 	/** Ensures startup fails when the admin password is too short. */
@@ -54,8 +63,8 @@ class GatewayEnvironmentValidatorTest {
 		assertDoesNotThrow(() -> validator.postProcessEnvironment(env, new SpringApplication()));
 	}
 
-	/** Builds a mock environment with H2 console off and a valid datasource password but no admin password. */
-	private static MockEnvironment baseEnv() {
+	/** Builds a mock environment with H2 console off and operational secrets but no admin password. */
+	private static MockEnvironment baseEnvWithoutAdmin() {
 		MockEnvironment env = new MockEnvironment();
 		env.setProperty("spring.datasource.password", GatewayTestCredentials.h2DatasourcePassword());
 		env.setProperty("spring.h2.console.enabled", "false");
@@ -63,5 +72,10 @@ class GatewayEnvironmentValidatorTest {
 		env.setProperty("GATEWAY_DEFAULT_TERMINAL_KEY", GatewayTestCredentials.defaultTerminalKey());
 		env.setProperty("ISO8583_BANK_HOST", GatewayTestCredentials.bankHost());
 		return env;
+	}
+
+	/** Builds a mock environment with all secrets unset except those explicitly provided in a test. */
+	private static MockEnvironment baseEnv() {
+		return baseEnvWithoutAdmin();
 	}
 }
