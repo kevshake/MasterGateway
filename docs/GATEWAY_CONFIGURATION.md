@@ -28,3 +28,17 @@ If an operator **sets** a password, key, or host that is too short, blocklisted,
 ## Tests
 
 See `GatewayGeneratedDefaultsTest` and `GatewayEnvironmentValidatorTest` for persistence, reuse, loopback bank host, weak-value failure, and banner text that never contains secret values.
+
+## Missing-configuration report and fleet profiles
+
+Before generated defaults are applied, `GatewayMissingConfigurationReporter` prints one
+`[GATEWAY MISSING CONFIGURATION]` banner per unset setting (env var, Spring property, every other
+place the value must match, how to set it; values are never printed).
+
+- **Lab profiles** (default, `local`): startup continues with generated defaults and
+  `GatewayDefaultSettingReminder` repeats the banner hourly.
+- **Fleet profiles** (`uat`, `prod`, `production`, `live`): startup is refused after the full report.
+  A generated zonal/terminal PIN key or loopback bank host can never match the real bank/switch, so
+  `GATEWAY_ADMIN_PASSWORD`, `H2_DATASOURCE_PASSWORD`, `GATEWAY_ZONAL_KEY`,
+  `GATEWAY_DEFAULT_TERMINAL_KEY` and `ISO8583_BANK_HOST` must all come from the deployment secret store.
+- Weak or sample values stop startup on every profile (unchanged).
