@@ -48,10 +48,11 @@ public class GatewayEnvironmentValidator implements EnvironmentPostProcessor, Or
 			"integrationtest-admin-pass-32chars!",
 			"integrationtest-h2-pass-32chars!!");
 
-	/** Generates missing defaults, then validates resolved configuration. */
+	/** Rejects weak values, reports every missing setting (fail closed on fleet profiles), generates lab defaults, then validates. */
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 		rejectUnsafeExplicitValues(environment);
+		GatewayMissingConfigurationReporter.reportAndEnforce(environment);
 		GatewayGeneratedDefaultsBootstrap.applyMissingDefaults(environment);
 		validateAdminPassword(environment);
 		validateH2Console(environment);
